@@ -223,6 +223,13 @@ body {
   cursor: pointer;
 }
 
+/* Página de login */
+.form-control {
+  border-radius: 0;
+  box-shadow: none!important;
+  margin-bottom: 10px;
+}
+
 /* Footer */
 footer {
   background-color: #292929;
