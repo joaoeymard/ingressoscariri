@@ -1,1 +1,1 @@
-angular.module("ingressosCariri", []);
+angular.module("ingressosCariri", ["ngRoute"]);
