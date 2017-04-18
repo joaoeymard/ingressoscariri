@@ -2,7 +2,7 @@ angular.module("ingressosCariri").controller("homeCtrl", function($scope, evento
   $scope.app = {
     'titulo': 'Ingressos Cariri - Portal de eventos do cariri'
   };
-  $scope.evento = {}
+  $scope.eventos = {};
 
   eventoAPI.getEventos().then(function(response){
     $scope.eventos = response.data;

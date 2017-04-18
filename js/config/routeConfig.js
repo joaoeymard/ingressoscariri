@@ -1,12 +1,22 @@
-angular.module("ingressosCariri").config(function ($routeProvider) {
-  $routeProvider.when("/home", {
+angular.module("ingressosCariri").config(function ($routeProvider, $locationProvider) {
+
+  $routeProvider.when("/", {
     templateUrl: "view/home.html",
     controller: "homeCtrl"
-  });
-  $routeProvider.when("/login", {
+  })
+  .when("/home", {
+    templateUrl: "view/home.html",
+    controller: "homeCtrl"
+  })
+  .when("/evento/:id", {
+    templateUrl: "view/evento.html",
+    controller: "eventoCtrl"
+  })
+  .when("/login", {
     templateUrl: "view/login.html",
     controller: "loginCtrl"
-  });
+  })
+  .otherwise({redirectTo: "/"});
 
-  $routeProvider.otherwise({redirectTo: "/home"});
+  $locationProvider.hashPrefix('');
 });

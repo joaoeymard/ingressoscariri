@@ -3,11 +3,20 @@ angular.module("ingressosCariri").directive("painelevento", function(){
     templateUrl: "view/painelEvento.html",
     replace: true,
     restrict: "E",
-    transclude: true
+    transclude: true,
+    scope: {
+      titulo: "@",
+      img: "@",
+      urlid: "@"
+    }
   };
 }).directive("paineleventoMenu", function(){
   return {
     templateUrl: "view/painelEventomenu.html",
-    restrict: "A"
+    restrict: "A",
+    scope: {
+      data: "@",
+      local: "@"
+    }
   };
 });
