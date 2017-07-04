@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html ng-app="ingressosCariri">
+<head>
+  <meta charset="UTF-8">
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bibliotecas CSS -->
+  <link rel="stylesheet" type="text/css" href="lib/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="lib/font_awesome/css/font-awesome.min.css">
+
+  <!-- Arquivos CSS -->
+  <link rel="stylesheet" type="text/css" href="css/app.css">
+
+
+  <!-- Informações da página -->
+  <title>Ingressos Cariri {{pos_titulo}}</title>
+  <link rel="shortcut icon" type="image/png" href="img/logo.png"/>
+
+  <meta name="description" content="Ingressos Cariri aqui você encontrará os principais eventos da região do cariri.">
+  <meta name="keywords" content="ingresso,comprar ingressos,ticket,show,evento,eventos,festa,festas,noitada,cariri,juazeiro do norte,barbalha,crato">
+  <meta name="author" content="http://cheype.com.br">
+
+  <meta property="og:locale" content="pt_BR" />
+  <meta property="og:title" content="Ingressos Cariri" />
+  <meta property="og:description" content="Ingressos Cariri aqui você encontrará os principais eventos da região do cariri." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="http://www.ingressoscariri.com.br/" />
+  <meta property="og:image" content="http://www.ingressoscariri.com.br/img/logo_com_fundo.jpg" />
+  <meta property="og:image:secure_url" content="http://www.ingressoscariri.com.br/img/logo_com_fundo.jpg" />
+  <meta property="og:site_name" content="Ingressos Cariri" />
+</head>
+<body>
+  <div ng-view></div>
+
+  <!-- Bibliotecas JS -->
+  <script type="text/javascript" src="lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="lib/bootstrap/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="lib/angular/angular.min.js"></script>
+  <script type="text/javascript" src="lib/angular/angular-locale_pt-br.js"></script>
+  <script type="text/javascript" src="lib/angular/angular-route.min.js"></script>
+  <script type="text/javascript" src="lib/angular/angular-cookies.min.js"></script>
+
+  <!-- Arquivos JS -->
+  <script type="text/javascript" src="js/app.js"></script>
+  <script type="text/javascript" src="js/config/routeConfig.js"></script>
+  <script type="text/javascript" src="js/controllers/homeCtrl.js"></script>
+  <script type="text/javascript" src="js/controllers/eventoCtrl.js"></script>
+
+  <script type="text/javascript" src="js/directives/card_evento.js"></script>
+  <script type="text/javascript" src="js/directives/navbar.js"></script>
+  <script type="text/javascript" src="js/directives/btn_ajuda.js"></script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+@media (max-width: 992px) /* Notebook */ {
+}
+
+@media (min-width: 768px) /* Tables ou maiores */ {
+  .navbar-nav { margin-top: 25px }
+  .card-evento:hover{
+    transform: scale(1.01);
+    box-shadow: 0 5px 5px #ccc;
+  }
+}
+@media (max-width: 768px) /* Tables ou menores */ {
+  .navbar-brand > img { height: 40px !important; }
+  .navbar-nav { text-align: center; }
+  .navbar-nav > li { display: inline-block; }
+}
+
+@media (max-width: 425px) /* Mobile */ {
+}

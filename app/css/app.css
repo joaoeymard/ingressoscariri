@@ -1,0 +1,126 @@
+@import "responsive.css";
+
+:root {
+  --cor1: #F2F2F2; /* Cinca claro */
+  --cor2: #D6D8D7; /* Cinca */
+  --cor3: #646066; /* Cinca escuro */
+  --cor4: #01B08B; /* Verde */
+  --cor5: #CC1467; /* Rosa */
+}
+
+ /* Estilos gerais */
+html, body {
+  background-color: var(--cor1);
+}
+.animacao {
+  -webkit-transition: 0.3s;
+  -moz-transition: 0.3s;
+  -o-transition: 0.3s;
+  transition: 0.3s;
+}
+.vertical-center {
+  display: flex !important;
+  align-items: center;
+}
+.uma-linha-text {
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  overflow: hidden;
+}
+.fa {
+  width: 18px;
+  text-align: center;
+}
+.fa-2x {
+  width: 28px;
+}
+/* Fim dos estilos gerais */
+
+.navbar {
+  background-color: #fff;
+  border-radius: 0;
+  border: 0;
+  border-top: 4px var(--cor4) solid;
+}
+.navbar-toggle {
+  margin-top: 20px;
+  border: none;
+  background-color: #fff !important;
+}
+.navbar-toggle .icon-bar {
+  background-color: var(--cor3) !important;
+}
+.navbar-brand {
+  height: inherit;
+}
+.navbar-brand > img {
+  height: 80px;
+}
+.navbar-nav > li > a > i {
+  margin-right: 5px;
+}
+.navbar-nav > li:hover > a {
+  color: var(--cor4) !important;
+}
+
+.card-evento {
+  background-color: #fff;
+  border-radius: 3px;
+  border: 1px var(--cor2) solid;
+}
+.card-evento .info-card-evento { padding: 0 15px; }
+.card-evento .table-card-evento {
+  margin-bottom: 10px;
+}
+.card-evento .table-card-evento td {
+  border: 0;
+  width: 50%;
+  padding: 2px 8px;
+}
+.card-evento .table-card-evento td i {
+  color: var(--cor5);
+}
+.card-evento .btn-card-evento {
+  font-size: 18px;
+  text-align: right;
+  margin: 0;
+  padding: 6px 25px;
+  width: 100%;
+  color: var(--cor4);
+  border-radius: 0;
+  border-top: 1px var(--cor2) solid;
+}
+
+.box-ajuda {
+  position: fixed;
+  bottom: 15px;
+}
+.box-ajuda .btn-ajuda {
+  background-color: var(--cor4);
+  color: #fff;
+  border-radius: 50px;
+  padding: 6px;
+  padding-right: 15px;
+}
+.box-ajuda .btn-ajuda i {
+  margin-right: 5px;
+}
+
+.box-img-banner-evento {
+  margin-top: -20px;
+  height: 300px;
+  width: 100%;
+  margin-bottom: 25px;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+  filter: brightness(35%);
+}
+.box-evento-info {
+  margin-top: -80px;
+  width: 100%;
+  height: 500px;
+  border-radius: 3px;
+  border: 1px var(--cor2) solid;
+  background-color: #fff;
+}
