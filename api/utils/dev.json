@@ -1,0 +1,22 @@
+{
+	"listen": "127.0.0.1:3001",
+	"cookieName": "ingressoscariri",
+	"hashKey": "ingressoscariri",
+	"blockKey": "E1DC4E27995B1BFB4DDB32141304B05D",
+	"database": {
+		"connectionRw": {
+			"host": "localhost port=5432",
+			"user": "postgres",
+			"pass": "123456",
+			"name": "site",
+			"maxOpenConn": 10
+		},
+		"connectionRo": {
+			"host": "localhost port=5432",
+			"user": "postgres",
+			"pass": "123456",
+			"name": "site",
+			"maxOpenConn": 10
+		}
+	}
+}
