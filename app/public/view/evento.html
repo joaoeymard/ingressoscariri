@@ -9,15 +9,31 @@
     <div class="col-md-8">
       <div class="box-evento-info">
         <ul class="nav-menu-top-box-evento">
-          <li class="btn vertical-center animacao"><i class="fa fa-map-marker fa-2x" aria-hidden="true"></i> Veja no mapa</li>
-          <li class="btn vertical-center animacao"><i class="fa fa-location-arrow fa-2x" aria-hidden="true"></i> Traçar rota</li>
+          <li class="btn vertical-center animacao"><i class="fa fa-map-marker fa-2x" aria-hidden="true"></i> <span class="hidden-xs">{{evento.cidade}}</span></li>
+          <li class="btn vertical-center animacao"><i class="fa fa-location-arrow fa-2x" aria-hidden="true"></i> <span class="hidden-xs">Traçar rota</span></li>
           <li class="btn btn-comprar vertical-center animacao"><i class="fa fa-shopping-cart fa-2x" aria-hidden="true"></i> Comprar agora</li>
         </ul>
 
-        <div class="col-xs-12">
+        <div style="padding: 0 15px">
           <h1>{{evento.titulo}}</h1>
 
+          <div class="box-evento-descricao">
+            <div class="col-sm-7 pull-right">
+              <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3957.40824117053!2d-39.304664085679555!3d-7.307949594725646!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x7a177cb1dc3881f%3A0xc2fdccdcc5e44682!2sR.+Pero+Coelho%2C+196+-+Centro%2C+Barbalha+-+CE%2C+63180-000!5e0!3m2!1spt-BR!2sbr!4v1499230950761" width="100%" height="150" frameborder="0" style="border:0" allowfullscreen></iframe>
+            </div>
+            {{evento.descricao}}
+          </div>
+
+          <hr>
+          <ul class="nav-menu-top-box-evento">
+            <li class="btn vertical-center animacao">
+              <span class="text-capitalize">{{evento.periodo[0].data | date: "EEEE" }}</span><br/>
+              <span>{{evento.periodo[0].data | date: "dd / MMM / yyyy" }}</span>
+            </li>
+          </ul>
+
         </div>
+
       </div>
     </div>
     <div class="col-md-4">
@@ -25,24 +41,34 @@
       <div class="col-xs-12">
         <ul class="list-galeria-evento">
           <li class="btn item-galeria-evento">
-            <img src="https://scontent-gru2-2.cdninstagram.com/t51.2885-15/s320x320/e35/19624386_1893404797579708_2276556589294944256_n.jpg" alt="" class="img-responsive">
-            <span class="item-zoom-galeria-evento vertical-center animacao"><i class="fa fa-search fa-2x" aria-hidden="true"></i></span>
+            <a href="https://scontent-gru2-2.cdninstagram.com/t51.2885-15/s320x320/e35/19624386_1893404797579708_2276556589294944256_n.jpg" data-lightbox="galeria-evento">
+              <img src="https://scontent-gru2-2.cdninstagram.com/t51.2885-15/s320x320/e35/19624386_1893404797579708_2276556589294944256_n.jpg" alt="" class="img-responsive">
+              <span class="item-zoom-galeria-evento vertical-center animacao"><i class="fa fa-search fa-2x" aria-hidden="true"></i></span>
+            </a>
           </li>
           <li class="btn item-galeria-evento">
-            <img src="https://scontent-gru2-2.cdninstagram.com/t51.2885-15/s320x320/e35/18948258_107059333269194_7173078130054135808_n.jpg" alt="" class="img-responsive">
-            <span class="item-zoom-galeria-evento vertical-center animacao"><i class="fa fa-search fa-2x" aria-hidden="true"></i></span>
+            <a href="https://scontent-gru2-2.cdninstagram.com/t51.2885-15/s320x320/e35/18948258_107059333269194_7173078130054135808_n.jpg" data-lightbox="galeria-evento">
+              <img src="https://scontent-gru2-2.cdninstagram.com/t51.2885-15/s320x320/e35/18948258_107059333269194_7173078130054135808_n.jpg" data-lightbox="galeria-evento" alt="" class="img-responsive">
+              <span class="item-zoom-galeria-evento vertical-center animacao"><i class="fa fa-search fa-2x" aria-hidden="true"></i></span>
+            </a>
           </li>
           <li class="btn item-galeria-evento">
-            <img src="https://scontent-gru2-2.cdninstagram.com/t51.2885-15/s320x320/e35/c0.65.720.720/19761279_1907960666086741_7918927466184310784_n.jpg" alt="" class="img-responsive">
-            <span class="item-zoom-galeria-evento vertical-center animacao"><i class="fa fa-search fa-2x" aria-hidden="true"></i></span>
+            <a href="https://scontent-gru2-2.cdninstagram.com/t51.2885-15/s320x320/e35/c0.65.720.720/19761279_1907960666086741_7918927466184310784_n.jpg" data-lightbox="galeria-evento">
+              <img src="https://scontent-gru2-2.cdninstagram.com/t51.2885-15/s320x320/e35/c0.65.720.720/19761279_1907960666086741_7918927466184310784_n.jpg" data-lightbox="galeria-evento" alt="" class="img-responsive">
+              <span class="item-zoom-galeria-evento vertical-center animacao"><i class="fa fa-search fa-2x" aria-hidden="true"></i></span>
+            </a>
           </li>
           <li class="btn item-galeria-evento">
-            <img src="https://scontent-gru2-2.cdninstagram.com/t51.2885-15/s320x320/e35/c0.53.640.640/19624638_1084550881680082_1924491802144931840_n.jpg" alt="" class="img-responsive">
-            <span class="item-zoom-galeria-evento vertical-center animacao"><i class="fa fa-search fa-2x" aria-hidden="true"></i></span>
+            <a href="https://scontent-gru2-2.cdninstagram.com/t51.2885-15/s320x320/e35/c0.53.640.640/19624638_1084550881680082_1924491802144931840_n.jpg" data-lightbox="galeria-evento">
+              <img src="https://scontent-gru2-2.cdninstagram.com/t51.2885-15/s320x320/e35/c0.53.640.640/19624638_1084550881680082_1924491802144931840_n.jpg" data-lightbox="galeria-evento" alt="" class="img-responsive">
+              <span class="item-zoom-galeria-evento vertical-center animacao"><i class="fa fa-search fa-2x" aria-hidden="true"></i></span>
+            </a>
           </li>
           <li class="btn item-galeria-evento">
-            <img src="https://scontent-gru2-2.cdninstagram.com/t51.2885-15/s320x320/e35/19624466_457475487944090_7326891045046714368_n.jpg" alt="" class="img-responsive">
-            <span class="item-zoom-galeria-evento vertical-center animacao"><i class="fa fa-search fa-2x" aria-hidden="true"></i></span>
+            <a href="https://scontent-gru2-2.cdninstagram.com/t51.2885-15/s320x320/e35/19624466_457475487944090_7326891045046714368_n.jpg" data-lightbox="galeria-evento">
+              <img src="https://scontent-gru2-2.cdninstagram.com/t51.2885-15/s320x320/e35/19624466_457475487944090_7326891045046714368_n.jpg" data-lightbox="galeria-evento" alt="" class="img-responsive">
+              <span class="item-zoom-galeria-evento vertical-center animacao"><i class="fa fa-search fa-2x" aria-hidden="true"></i></span>
+            </a>
           </li>
         </ul>
       </div>

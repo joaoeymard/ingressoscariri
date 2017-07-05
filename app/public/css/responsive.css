@@ -4,14 +4,15 @@
 @media (min-width: 768px) /* Tables ou maiores */ {
   .navbar-nav { margin-top: 25px }
   .card-evento:hover{
-    transform: scale(1.01);
-    box-shadow: 0 5px 5px #ccc;
+    transform: translateY(-4px);
+    box-shadow: 0 5px 50px #ccc;
   }
 }
 @media (max-width: 768px) /* Tables ou menores */ {
   .navbar-brand > img { height: 40px !important; }
   .navbar-nav { text-align: center; }
   .navbar-nav > li { display: inline-block; }
+  .btn-close-zoom-galeria-evento { font-size: 22px; }
 }
 
 @media (max-width: 425px) /* Mobile */ {
