@@ -13,6 +13,15 @@
   .navbar-nav { text-align: center; }
   .navbar-nav > li { display: inline-block; }
   .btn-close-zoom-galeria-evento { font-size: 22px; }
+  .nav-menu-periodo-evento .item-menu-periodo-evento .item-menu-mes {
+    font-size: 10px !important;
+  }
+  .nav-menu-periodo-evento .item-menu-periodo-evento .item-menu-dia {
+    font-size: 16px !important;
+  }
+  .nav-menu-periodo-evento .item-menu-periodo-evento .item-menu-semana {
+    font-size: 8px !important;
+  }
 }
 
 @media (max-width: 425px) /* Mobile */ {
