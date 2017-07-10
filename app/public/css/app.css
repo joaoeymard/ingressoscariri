@@ -27,6 +27,7 @@ html, body {
   white-space:nowrap;
   overflow: hidden;
 }
+.btn { box-shadow: none !important}
 .fa {
   width: 18px;
   text-align: center;
@@ -102,6 +103,9 @@ html, body {
   padding: 6px;
   padding-right: 15px;
 }
+.box-ajuda .btn-ajuda:hover {
+  opacity: 0.8;
+}
 .box-ajuda .btn-ajuda i {
   margin-right: 5px;
 }
@@ -119,16 +123,23 @@ html, body {
 .box-evento-info {
   margin-top: -80px;
   width: 100%;
-  height: 500px;
   border-radius: 3px;
   border: 1px var(--cor2) solid;
   background-color: #fff;
+}
+.box-evento-mapa {
+  pointer-events: none;
+}
+.box-evento-descricao {
+  padding: 0 15px;
+  text-align: justify;
 }
 .nav-menu-top-box-evento {
   display: flex;
   justify-content: space-around;
   margin: 0;
   padding: 0;
+  overflow: hidden;
 }
 .nav-menu-top-box-evento .btn {
   padding: 13px 15px;
@@ -143,8 +154,38 @@ html, body {
   color: #fff;
 }
 .nav-menu-top-box-evento .btn i { margin-right: 5px }
+.nav-menu-periodo-evento {
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+.nav-menu-periodo-evento li {
+  width: 100px !important;
+  background: none !important;
+  border-bottom: 2px transparent solid !important;
+  color: var(--cor3) !important;
+}
+.nav-menu-periodo-evento li:hover, .nav-menu-periodo-evento li.active {
+  border-bottom-color: var(--cor4) !important;
+}
+.nav-menu-periodo-evento .item-menu-periodo-evento .item-menu-mes {
+  font-size: 12px;
+  display: block;
+}
+.nav-menu-periodo-evento .item-menu-periodo-evento .item-menu-dia {
+  font-size: 18px;
+  display: block;
+  line-height: 1;
+}
+.nav-menu-periodo-evento .item-menu-periodo-evento .item-menu-semana {
+  display: block;
+  font-size: 10px;
+  line-height: 1;
+}
 
 .list-galeria-evento {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -158,7 +199,6 @@ html, body {
   margin: 5px;
   padding: 0;
   border-radius: 0;
-  float: left;
   overflow: hidden;
 }
 .item-zoom-galeria-evento {
@@ -169,6 +209,7 @@ html, body {
   height: 100%;
   margin-top: 100px;
   background-color: #fff;
+  color: var(--cor3);
   opacity: 0.8;
   justify-content: center;
 }
