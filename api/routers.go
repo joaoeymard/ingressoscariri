@@ -8,11 +8,13 @@ import (
 // Routes pacotes das rotas
 func Routes(app *iris.Application) {
 
-	apiParty := app.Party("/api")
+	apiParty := app.Party("/api/")
 	{
 
-		v1Party := apiParty.Party("/v1")
-		v1.ConfigRoutes(v1Party)
+		v1Party := apiParty.Party("v1")
+		{
+			v1.ConfigRoutes(v1Party)
+		}
 
 	}
 

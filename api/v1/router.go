@@ -1,33 +1,38 @@
 package v1
 
 import (
-	"github.com/JoaoEymard/ingressoscariri/api/v1/controllers/auth"
+	ctrlAuth "github.com/JoaoEymard/ingressoscariri/api/v1/controllers/auth"
 	ctrlEventos "github.com/JoaoEymard/ingressoscariri/api/v1/controllers/eventos"
 	ctrlMapa "github.com/JoaoEymard/ingressoscariri/api/v1/controllers/mapa"
-	"github.com/JoaoEymard/ingressoscariri/api/v1/middleware"
+	// ctrlMiddleware "github.com/JoaoEymard/ingressoscariri/api/v1/middleware"
+	"github.com/kataras/iris/context"
 	"github.com/kataras/iris/core/router"
 )
 
 // ConfigRoutes Tratamento das Rotas publicas
-func ConfigRoutes(router router.Party) {
+func ConfigRoutes(route router.Party) {
 
 	//Login
-	router.Get("/login/{user:string}/{passw:string}", auth.Login)
+	route.Get("/login/{user:string}/{passw:string}", ctrlAuth.Login)
 
 	//Logoff
-	router.Get("/logoff", auth.Logoff)
+	route.Get("/logout", ctrlAuth.Logout)
 
 	// Mapa
-	router.Get("/map", middleware.Check, ctrlMapa.Find)
+	route.Get("/map", ctrlAuth.Check, ctrlMapa.Find)
 
 	//Eventos
-	router.Get("/eventos", ctrlEventos.FindAll)
-	router.Get("/eventos/simples")
-	router.Get("/eventos/{id:int}")
+	route.Get("/eventos", ctrlEventos.FindAll)
+	// route.Get("/eventos/simples")
+	// route.Get("/eventos/{id:int}")
+
+	route.Get("/", func(ctx context.Context) {
+		ctx.JSON(map[string]string{"api": "testeAPI"})
+	})
 
 	// CEP
-	//router.Get("/cep/{cep:"+utils.Regex["integer"]+"}", ctrlCep.Find)
+	//route.Get("/cep/{cep:"+utils.Regex["integer"]+"}", ctrlCep.Find)
 
-	//router.Get("/cidades", ctrlCidades.FindAll)
+	//route.Get("/cidades", ctrlCidades.FindAll)
 
 }
