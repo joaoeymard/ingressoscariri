@@ -1,6 +1,7 @@
 angular.module("ingressosCariri").controller('homeCtrl', funcCtrl)
 
-function funcCtrl($scope){
+function funcCtrl($scope, $rootScope){
+  $rootScope.pos_titulo = 'Ingressos Cariri'
   $scope.evento = {
     titulo: "Uma festa qualquer",
     img: "evento.png",

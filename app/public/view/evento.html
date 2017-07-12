@@ -25,44 +25,18 @@
           </div>
 
           <hr id="periodo-evento">
-          <ul class="nav-menu-top-box-evento nav-menu-periodo-evento" ng-init="click = 1">
-            <li class="btn vertical-center animacao" ng-class="{'active': click==1}" ng-click="click = 1">
-              <div class="item-menu-periodo-evento">
-                <span class="text-uppercase item-menu-mes">{{evento.periodo[0].data | date: "MMM" }}</span>
-                <span class="item-menu-dia">{{evento.periodo[0].data | date: "dd" }}</span>
-                <span class="text-capitalize text-muted item-menu-semana"><small>{{evento.periodo[0].data | date: "EEEE" }}</small></span>
-              </div>
-            </li>
-            <li class="btn vertical-center animacao" ng-class="{'active': click==2}" ng-click="click = 2">
-              <div class="item-menu-periodo-evento">
-                <span class="text-uppercase item-menu-mes">{{evento.periodo[0].data | date: "MMM" }}</span>
-                <span class="item-menu-dia">{{evento.periodo[0].data | date: "dd" }}</span>
-                <span class="text-capitalize text-muted item-menu-semana"><small>{{evento.periodo[0].data | date: "EEEE" }}</small></span>
-              </div>
-            </li>
-            <li class="btn vertical-center animacao" ng-class="{'active': click==3}" ng-click="click = 3">
-              <div class="item-menu-periodo-evento">
-                <span class="text-uppercase item-menu-mes">{{evento.periodo[0].data | date: "MMM" }}</span>
-                <span class="item-menu-dia">{{evento.periodo[0].data | date: "dd" }}</span>
-                <span class="text-capitalize text-muted item-menu-semana"><small>{{evento.periodo[0].data | date: "EEEE" }}</small></span>
-              </div>
-            </li>
-            <li class="btn vertical-center animacao" ng-class="{'active': click==4}" ng-click="click = 4">
-              <div class="item-menu-periodo-evento">
-                <span class="text-uppercase item-menu-mes">{{evento.periodo[0].data | date: "MMM" }}</span>
-                <span class="item-menu-dia">{{evento.periodo[0].data | date: "dd" }}</span>
-                <span class="text-capitalize text-muted item-menu-semana"><small>{{evento.periodo[0].data | date: "EEEE" }}</small></span>
-              </div>
-            </li>
-            <li class="btn vertical-center animacao" ng-class="{'active': click==5}" ng-click="click = 5">
-              <div class="item-menu-periodo-evento">
-                <span class="text-uppercase item-menu-mes">{{evento.periodo[0].data | date: "MMM" }}</span>
-                <span class="item-menu-dia">{{evento.periodo[0].data | date: "dd" }}</span>
-                <span class="text-capitalize text-muted item-menu-semana"><small>{{evento.periodo[0].data | date: "EEEE" }}</small></span>
-              </div>
-            </li>
+          <ul class="nav-menu-top-box-evento nav-menu-periodo-evento" data-ng-init="click = 0">
+            <div ng-repeat="ingresso in ingressos">
+              <li class="btn vertical-center animacao" ng-class="{'active': click==$index}" ng-click="click = $index">
+                <div class="item-menu-periodo-evento">
+                  <span class="text-uppercase item-menu-mes">{{ingresso.data | date: "MMM" }}</span>
+                  <span class="item-menu-dia">{{ingresso.data | date: "dd" }}</span>
+                  <span class="text-capitalize text-muted item-menu-semana"><small>{{ingresso.data | date: "EEEE" }}</small></span>
+                </div>
+              </li>
+            </div>
           </ul>
-
+          {{click}}
           <div class="space-comprar">
             <div class="col-sm-5">
               <h4>Programação:</h4>
@@ -70,24 +44,14 @@
             </div>
             <div class="col-sm-7">
               <div class="table-responsive">
-                <table class="table table-condensed table-categoria-ingresso" ng-init="qtd = 0; min = 0; max = 5">
+                <table class="table table-condensed table-categoria-ingresso" ng-init="min = 0; max = 5;">
                   <tr>
                     <td>Pista (1 lote)<br><span class="text-success">R$ 40,00</span></td>
                     <td class="box-qtd">
                       <div class="input-group qtd-ingressos">
-                        <span class="input-group-addon menos btn" ng-click="qtd > min ? qtd = qtd-1 : qtd">-</span>
-                        <input type="text" class="form-control text-center" value="{{qtd}}" min="{{min}}" max="{{max}}" readonly="">
-                        <span class="input-group-addon mais btn" ng-click="qtd < max ? qtd = qtd+1 : qtd">+</span>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>VIP<br><span class="text-success">R$ 80,00</span></td>
-                    <td class="box-qtd">
-                      <div class="input-group qtd-ingressos">
-                        <span class="input-group-addon menos btn">-</span>
-                        <input type="text" class="form-control text-center" value="0" min="0" readonly="">
-                        <span class="input-group-addon mais btn">+</span>
+                        <span class="input-group-addon menos btn" ng-click="ingresso.qtd > min ? ingresso.qtd = ingresso.qtd-1 : ingresso.qtd">-</span>
+                        <input type="text" class="form-control text-center" value="{{ingresso.qtd}}" ng-model="ingressos.qtd" min="{{min}}" max="{{max}}" readonly="">
+                        <span class="input-group-addon mais btn" ng-click="ingresso.qtd < max ? ingresso.qtd = ingresso.qtd+1 : ingresso.qtd">+</span>
                       </div>
                     </td>
                   </tr>
