@@ -8,11 +8,11 @@
   <div class="row">
     <div class="col-md-8">
       <div class="box-evento-info">
-        <ul class="nav-menu-top-box-evento">
-          <li class="btn vertical-center animacao"><i class="fa fa-map-marker fa-2x" aria-hidden="true"></i> <span class="hidden-xs">{{evento.cidade}}</span></li>
-          <li class="btn vertical-center animacao"><i class="fa fa-location-arrow fa-2x" aria-hidden="true"></i> <span class="hidden-xs">Traçar rota</span></li>
-          <li class="btn btn-comprar vertical-center animacao"><i class="fa fa-shopping-cart fa-2x" aria-hidden="true"></i> Comprar agora</li>
-        </ul>
+        <div class="nav-menu-top-box-evento">
+          <a class="btn vertical-center animacao"><i class="fa fa-map-marker fa-2x" aria-hidden="true"></i> <span class="hidden-xs">{{evento.cidade}}</span></a>
+          <a class="btn vertical-center animacao"><i class="fa fa-location-arrow fa-2x" aria-hidden="true"></i> <span class="hidden-xs">Traçar rota</span></a>
+          <a scroll-to="#periodo-evento" offset="20" duration="200" class="btn btn-comprar vertical-center animacao"><i class="fa fa-shopping-cart fa-2x" aria-hidden="true"></i> Comprar agora</a>
+        </div>
 
         <div style="padding: 0 15px">
           <h1>{{evento.titulo}}</h1>
@@ -24,7 +24,7 @@
             {{evento.descricao}}
           </div>
 
-          <hr>
+          <hr id="periodo-evento">
           <ul class="nav-menu-top-box-evento nav-menu-periodo-evento" ng-init="click = 1">
             <li class="btn vertical-center animacao" ng-class="{'active': click==1}" ng-click="click = 1">
               <div class="item-menu-periodo-evento">
@@ -62,6 +62,47 @@
               </div>
             </li>
           </ul>
+
+          <div class="space-comprar">
+            <div class="col-sm-5">
+              <h4>Programação:</h4>
+              <p>Aviões do Forró, Jonas Esticado, Maiara e Maraisa</p>
+            </div>
+            <div class="col-sm-7">
+              <div class="table-responsive">
+                <table class="table table-condensed table-categoria-ingresso" ng-init="qtd = 0; min = 0; max = 5">
+                  <tr>
+                    <td>Pista (1 lote)<br><span class="text-success">R$ 40,00</span></td>
+                    <td class="box-qtd">
+                      <div class="input-group qtd-ingressos">
+                        <span class="input-group-addon menos btn" ng-click="qtd > min ? qtd = qtd-1 : qtd">-</span>
+                        <input type="text" class="form-control text-center" value="{{qtd}}" min="{{min}}" max="{{max}}" readonly="">
+                        <span class="input-group-addon mais btn" ng-click="qtd < max ? qtd = qtd+1 : qtd">+</span>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>VIP<br><span class="text-success">R$ 80,00</span></td>
+                    <td class="box-qtd">
+                      <div class="input-group qtd-ingressos">
+                        <span class="input-group-addon menos btn">-</span>
+                        <input type="text" class="form-control text-center" value="0" min="0" readonly="">
+                        <span class="input-group-addon mais btn">+</span>
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div style="clear: both"></div>
+
+          <div class="text-right">
+            <a href="#" class="btn text-danger">Limpar Carrinho</a>
+            <a href="#" class="btn btn-evento-comprar">Comprar Ingressos</a>
+          </div>
+          <hr>
 
         </div>
 

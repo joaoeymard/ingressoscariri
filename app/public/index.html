@@ -35,11 +35,13 @@
 <body>
   <div ng-view></div>
 
+
   <!-- Bibliotecas JS -->
   <script type="text/javascript" src="lib/jquery/jquery.min.js"></script>
   <script type="text/javascript" src="lib/bootstrap/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="lib/lightbox/js/lightbox.min.js"></script>
   <script type="text/javascript" src="lib/angular/angular.min.js"></script>
+  <script type="text/javascript" src="lib/scrollto/angular-scrollto.min.js"></script>
   <script type="text/javascript" src="lib/angular/angular-locale_pt-br.js"></script>
   <script type="text/javascript" src="lib/angular/angular-route.min.js"></script>
   <script type="text/javascript" src="lib/angular/angular-cookies.min.js"></script>
@@ -56,12 +58,11 @@
   <script type="text/javascript" src="js/directives/btn_ajuda.js"></script>
 
   <script>
-    lightbox.option({
-      'albumLabel': 'Imagem %1 de %2',
-      'disableScrolling': true,
-      'alwaysShowNavOnTouchDevices': true,
-      'fitImagesInViewport': true,
-    })
-</script>
+  lightbox.option({
+    'albumLabel': 'Imagem %1 de %2',
+    'alwaysShowNavOnTouchDevices': true,
+    'fitImagesInViewport': true,
+  })
+  </script>
 </body>
 </html>

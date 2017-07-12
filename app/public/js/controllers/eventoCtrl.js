@@ -1,8 +1,7 @@
 angular.module("ingressosCariri").controller('eventoCtrl', funcCtrl)
 
-function funcCtrl($scope,$routeParams,$rootScope){
-  $rootScope.pos_titulo = ' - '+$routeParams.titulo
-  $scope.teste = $routeParams.titulo
+function funcCtrl($scope,$routeParams,$rootScope,$location,$anchorScroll){
+  $rootScope.pos_titulo = ' - ' + $routeParams.titulo
 
   $scope.evento = {
     titulo: "Uma festa qualquer",

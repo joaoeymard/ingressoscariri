@@ -2,10 +2,27 @@
 }
 
 @media (min-width: 768px) /* Tables ou maiores */ {
-  .navbar-nav { margin-top: 25px }
+  .navbar-nav { margin-top: 25px; }
   .card-evento:hover{
     transform: translateY(-4px);
     box-shadow: 0 5px 50px #ccc;
+  }
+  .table-categoria-ingresso tr td:first-child::before {
+    content: '>';
+    position: relative;
+    margin-left: -15px;
+    width: 2px;
+    height: 2px;
+    margin-right: 5px;
+    color: gray;
+
+    -webkit-transition: 0.3s;
+    -moz-transition: 0.3s;
+    -o-transition: 0.3s;
+    transition: 0.3s;
+  }
+  .table-categoria-ingresso tr:hover td:first-child::before {
+    margin-left: 0;
   }
 }
 @media (max-width: 768px) /* Tables ou menores */ {
@@ -22,6 +39,8 @@
   .nav-menu-periodo-evento .item-menu-periodo-evento .item-menu-semana {
     font-size: 8px !important;
   }
+  .box-qtd { width: 50% !important; }
+  .nav-menu-periodo-evento { justify-content: center !important; }
 }
 
 @media (max-width: 425px) /* Mobile */ {

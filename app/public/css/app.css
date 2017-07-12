@@ -35,6 +35,7 @@ html, body {
 .fa-2x {
   width: 28px;
 }
+.form-control { box-shadow: none !important }
 /* Fim dos estilos gerais */
 
 .navbar {
@@ -144,6 +145,7 @@ html, body {
 .nav-menu-top-box-evento .btn {
   padding: 13px 15px;
   width: 50%;
+  color: var(--cor3);
   justify-content: center;
   border-radius: 0;
   border: 0;
@@ -215,4 +217,32 @@ html, body {
 }
 .item-galeria-evento:hover .item-zoom-galeria-evento {
   margin-top: 0;
+}
+
+.space-comprar { margin-top: 10px }
+.table-responsive { border: 0 !important }
+.table-categoria-ingresso tr { overflow: hidden; }
+.table-categoria-ingresso tr td {
+  padding: 10px 5px !important;
+  vertical-align: middle !important;
+}
+.table-categoria-ingresso tr:last-child td { border-bottom: 1px solid #ddd }
+.box-qtd { width: 50%; }
+.box-qtd .qtd-ingressos {
+  margin: 0;
+  padding: 0;
+}
+.box-qtd .qtd-ingressos input {
+  cursor: not-allowed !important;
+  background-color: #fff;
+  height: 28px;
+  outline: none;
+  border-color: #ddd;
+}
+
+.btn-evento-comprar {
+  background-color: var(--cor4);
+  color: #fff !important;
+  border-radius: 0;
+  padding: 6px 20px;
 }

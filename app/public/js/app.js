@@ -1,1 +1,1 @@
-angular.module("ingressosCariri", ["ngRoute", "ngCookies"]);
+angular.module("ingressosCariri", ["ngRoute", "ngCookies", "scrollto"]);
