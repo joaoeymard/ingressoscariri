@@ -1,23 +1,37 @@
 package auth
 
 import (
+	"github.com/JoaoEymard/ingressoscariri/api/utils"
+	"github.com/kataras/iris"
 	"github.com/kataras/iris/context"
 )
 
-func Check(ctx context.Context) bool {
-	session, _ := ctx.Session().GetBoolean("iddoido")
-	if session {
-		return true
+func Check(ctx context.Context) {
+	sess := utils.GetSession().Start(ctx)
+	value, _ := sess.GetBoolean("sessionCript")
+	if value {
+		ctx.Next()
 	}
-	return false
-
+	ctx.StatusCode(iris.StatusForbidden)
 }
 
 func Login(ctx context.Context) {
 	if ctx.Params().Get("user") == "c019" && ctx.Params().Get("passw") == "admin" {
-		ctx.Session().Set("iddoido", true)
+		sess := utils.GetSession().Start(ctx)
+		sess.Set("sessionCript", true)
+		ctx.JSON(map[string]interface{}{"Login": "OK"})
+		return
 	}
+	ctx.JSON(map[string]interface{}{"Login": "Incorreto"})
+
 }
-func Logoff(ctx context.Context) {
-	ctx.Session().Delete("iddoido")
+
+func Logout(ctx context.Context) {
+	sess := utils.GetSession().Start(ctx)
+	if sess.Get("sessionCript") != nil {
+		sess.Delete("sessionCript")
+		ctx.JSON(map[string]interface{}{"Logout": "OK"})
+		return
+	}
+	ctx.JSON(map[string]interface{}{"Logout": "Nil"})
 }

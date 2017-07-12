@@ -1,8 +1,8 @@
 {
 	"listen": "127.0.0.1:3001",
 	"cookieName": "ingressoscariri",
-	"hashKey": "ingressoscariri",
-	"blockKey": "E1DC4E27995B1BFB4DDB32141304B05D",
+	"hashKey": "the-big-and-secret-fash-key-here",
+	"blockKey": "lot-secret-of-characters-big-too", //"E1DC4E27995B1BFB4DDB32141304B05D",
 	"database": {
 		"connectionRw": {
 			"host": "localhost port=5432",

@@ -1,4 +1,4 @@
-package settings
+package utils
 
 import (
 	"encoding/json"
@@ -6,6 +6,11 @@ import (
 	"io/ioutil"
 	"os"
 	"strconv"
+	"time"
+
+	"github.com/gorilla/securecookie"
+	"github.com/kataras/iris/context"
+	"github.com/kataras/iris/sessions"
 )
 
 type Settings struct {
@@ -38,6 +43,8 @@ var (
 var (
 	environments = map[string]string{"production": "api/utils/prod.json", "development": "api/utils/dev.json"}
 	settings     Settings
+	session      *sessions.Sessions
+	ctx          context.Context
 	env          string
 )
 
@@ -51,11 +58,12 @@ func init() {
 		}
 		env = "development"
 	}
-	LoadSettingsByEnv(env)
+	loadSettingsByEnv(env)
+	loadSession()
 }
 
-// LoadSettingsByEnv Receber as configurações do json, correspondente ao env, e setar no struct
-func LoadSettingsByEnv(env string) {
+// loadSettingsByEnv Receber as configurações do json, correspondente ao env, e setar no struct
+func loadSettingsByEnv(env string) {
 
 	content, err := ioutil.ReadFile(environments[env])
 	if err != nil {
@@ -76,9 +84,27 @@ func LoadSettingsByEnv(env string) {
 	}
 }
 
-// Get Retorna as configurações
-func Get() Settings {
+func loadSession() {
+	cookieName := settings.CookieName
+	hashKey := []byte(settings.HashKey)
+	blockKey := []byte(settings.BlockKey)
+	secureCookie := securecookie.New(hashKey, blockKey)
+
+	session = sessions.New(sessions.Config{
+		Cookie:  cookieName,
+		Encode:  secureCookie.Encode,
+		Decode:  secureCookie.Decode,
+		Expires: 5 * time.Minute,
+	})
+}
+
+// GetSettings Retorna as configurações
+func GetSettings() Settings {
 	return settings
+}
+
+func GetSession() *sessions.Sessions {
+	return session
 }
 
 // IsTestEnvironment Teste
