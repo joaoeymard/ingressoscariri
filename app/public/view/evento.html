@@ -25,9 +25,9 @@
           </div>
 
           <hr id="periodo-evento">
-          <ul class="nav-menu-top-box-evento nav-menu-periodo-evento" data-ng-init="click = 0">
+          <ul class="nav-menu-top-box-evento nav-menu-periodo-evento" data-ng-init="ingressoShow = 0">
             <div ng-repeat="ingresso in ingressos">
-              <li class="btn vertical-center animacao" ng-class="{'active': click==$index}" ng-click="click = $index">
+              <li class="btn vertical-center animacao" ng-class="{'active': ingressoShow==$index}" ng-click="mudouIngresso($index)">
                 <div class="item-menu-periodo-evento">
                   <span class="text-uppercase item-menu-mes">{{ingresso.data | date: "MMM" }}</span>
                   <span class="item-menu-dia">{{ingresso.data | date: "dd" }}</span>
@@ -36,22 +36,21 @@
               </li>
             </div>
           </ul>
-          {{click}}
-          <div class="space-comprar">
+          <div class="space-comprar" ng-repeat="ingresso in ingressos" ng-show="ingressoShow==$index">
             <div class="col-sm-5">
               <h4>Programação:</h4>
-              <p>Aviões do Forró, Jonas Esticado, Maiara e Maraisa</p>
+              <p>{{ingresso.atracao}}</p>
             </div>
             <div class="col-sm-7">
               <div class="table-responsive">
                 <table class="table table-condensed table-categoria-ingresso" ng-init="min = 0; max = 5;">
-                  <tr>
-                    <td>Pista (1 lote)<br><span class="text-success">R$ 40,00</span></td>
+                  <tr ng-repeat="categoria in ingresso.categoria">
+                    <td>{{categoria.nome}}<br><span class="text-success">{{categoria.valor}}</span></td>
                     <td class="box-qtd">
-                      <div class="input-group qtd-ingressos">
-                        <span class="input-group-addon menos btn" ng-click="ingresso.qtd > min ? ingresso.qtd = ingresso.qtd-1 : ingresso.qtd">-</span>
-                        <input type="text" class="form-control text-center" value="{{ingresso.qtd}}" ng-model="ingressos.qtd" min="{{min}}" max="{{max}}" readonly="">
-                        <span class="input-group-addon mais btn" ng-click="ingresso.qtd < max ? ingresso.qtd = ingresso.qtd+1 : ingresso.qtd">+</span>
+                      <div class="input-group qtd-ingressos" data-ng-init="categoria.quantidade = 0">
+                        <span class="input-group-addon menos btn" ng-click="categoria.quantidade > min ? categoria.quantidade = categoria.quantidade-1 : categoria.quantidade">-</span>
+                        <input type="text" class="form-control text-center" value="{{categoria.quantidade}}" ng-model="categoria.quantidade" min="{{min}}" max="{{max}}" readonly="">
+                        <span class="input-group-addon mais btn" ng-click="categoria.quantidade < max ? categoria.quantidade = categoria.quantidade+1 : categoria.quantidade">+</span>
                       </div>
                     </td>
                   </tr>

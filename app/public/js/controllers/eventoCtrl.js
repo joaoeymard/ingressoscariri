@@ -2,6 +2,11 @@ angular.module("ingressosCariri").controller('eventoCtrl', funcCtrl)
 
 function funcCtrl($scope,$routeParams,$rootScope,$location,$anchorScroll){
   $rootScope.pos_titulo = $routeParams.titulo + ' - Ingressos Cariri'
+  $scope.ingressoShow = 0
+
+  $scope.mudouIngresso = function(id){
+    $scope.ingressoShow = id
+  }
 
   $scope.evento = {
     titulo: "Uma festa qualquer",
@@ -33,15 +38,14 @@ function funcCtrl($scope,$routeParams,$rootScope,$location,$anchorScroll){
     data: "2017-07-07T00:00",
     hora: "22:00",
     atracao: "Jorge e Matheus, Safadão",
-    lote: 1,
     categoria: [{
       nome: "VIP - Inteira",
       valor: 100.00,
-      quantidade: 0
+      quantidade: 100
     },{
       nome: "VIP - Meia",
       valor: 60.00,
-      quantidade: 0
+      quantidade: 50
     }],
   },{
     data: "2017-07-08T00:00",
@@ -51,11 +55,11 @@ function funcCtrl($scope,$routeParams,$rootScope,$location,$anchorScroll){
     categoria: [{
       nome: "VIP - Inteira",
       valor: 60.00,
-      quantidade: 0
+      quantidade: 120
     },{
       nome: "VIP - Meia",
       valor: 30.00,
-      quantidade: 0
+      quantidade: 100
     }],
   }]
 }
