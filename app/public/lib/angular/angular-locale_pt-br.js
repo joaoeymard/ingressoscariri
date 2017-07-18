@@ -90,7 +90,7 @@ $provide.value("$locale", {
     "shortTime": "HH:mm"
   },
   "NUMBER_FORMATS": {
-    "CURRENCY_SYM": "R$",
+    "CURRENCY_SYM": "R$ ",
     "DECIMAL_SEP": ",",
     "GROUP_SEP": ".",
     "PATTERNS": [

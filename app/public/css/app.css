@@ -69,6 +69,7 @@ html, body {
   background-color: #fff;
   border-radius: 3px;
   border: 1px var(--cor2) solid;
+  margin-bottom: 15px;
 }
 .card-evento .info-card-evento { padding: 0 15px; }
 .card-evento .table-card-evento {
@@ -144,13 +145,16 @@ html, body {
 }
 .nav-menu-top-box-evento .btn {
   padding: 13px 15px;
-  width: 50%;
+  width: 35%;
   color: var(--cor3);
   justify-content: center;
   border-radius: 0;
   border: 0;
 }
-.nav-menu-top-box-evento .btn-comprar { color: var(--cor4) }
+.nav-menu-top-box-evento .btn-comprar {
+  color: var(--cor4);
+  width: 40%;
+}
 .nav-menu-top-box-evento .btn:hover {
   background-color: var(--cor4);
   color: #fff;
@@ -180,7 +184,7 @@ html, body {
 }
 .nav-menu-periodo-evento .item-menu-periodo-evento .item-menu-semana {
   display: block;
-  font-size: 10px;
+  font-size: 13px;
   line-height: 1;
 }
 
@@ -245,4 +249,25 @@ html, body {
   color: #fff !important;
   border-radius: 0;
   padding: 6px 20px;
+}
+
+.btn-avancar-carrinho {
+  width: 40%;
+  border: 0;
+  border-bottom: 2px var(--cor4) solid;
+  border-top: 2px var(--cor4) solid;
+  color: var(--cor4) !important;
+  overflow: hidden;
+  position: relative;
+  display: block;
+  margin: 10px auto;
+}
+.btn-avancar-carrinho i {
+  font-size: 60px;
+}
+.btn-avancar-carrinho span {
+  font-size: 16px;
+  position: relative;
+  bottom: 14px;
+  margin-right: 10px
 }
