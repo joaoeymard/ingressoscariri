@@ -4,10 +4,8 @@ import (
 	"runtime"
 
 	"github.com/JoaoEymard/ingressoscariri/api"
-	"github.com/JoaoEymard/ingressoscariri/api/utils"
+	"github.com/JoaoEymard/ingressoscariri/api/utils/settings"
 	//sql "github.com/JoaoEymard/ingressoscariri/service/core/database"
-
-	"fmt"
 
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/middleware/logger"
@@ -44,13 +42,11 @@ func main() {
 
 	api.Routes(app)
 
-	err := app.Run(iris.Addr(utils.GetSettings().Listen), iris.WithCharset("UTF-8"))
+	err := app.Run(iris.Addr(settings.GetSettings().Listen), iris.WithCharset("UTF-8"), iris.WithoutServerError(iris.ErrServerClosed))
 	if err != nil {
-		if err != iris.ErrServerClosed {
-			app.Logger().Warnf("Shutdown with error: %v\n", err.Error())
-		} else {
-			fmt.Print("\n")
-		}
+		app.Logger().Errorln("Exiting the server, with error:", err.Error())
+		return
 	}
+	app.Logger().Infoln("Exiting the server...")
 
 }
