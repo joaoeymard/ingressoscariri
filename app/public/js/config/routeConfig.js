@@ -12,6 +12,10 @@ angular.module("ingressosCariri").config(function ($routeProvider, $locationProv
   .when("/ajuda", {
     templateUrl: "view/ajuda.html"
   })
+  .when("/carrinho", {
+    templateUrl: "view/carrinho.html",
+    controller: "carrinhoCtrl"
+  })
 
   .when("/erro", {
     templateUrl: "view/erro.html"

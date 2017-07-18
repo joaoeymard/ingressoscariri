@@ -31,16 +31,21 @@
   .navbar-nav > li { display: inline-block; }
   .btn-close-zoom-galeria-evento { font-size: 22px; }
   .nav-menu-periodo-evento .item-menu-periodo-evento .item-menu-mes {
-    font-size: 10px !important;
+    font-size: 14px !important;
   }
   .nav-menu-periodo-evento .item-menu-periodo-evento .item-menu-dia {
-    font-size: 16px !important;
+    font-size: 18px !important;
   }
   .nav-menu-periodo-evento .item-menu-periodo-evento .item-menu-semana {
-    font-size: 8px !important;
+    font-size: 12px !important;
   }
   .box-qtd { width: 50% !important; }
   .nav-menu-periodo-evento { justify-content: center !important; }
+  .nav-menu-top-box-evento .btn-comprar { width: 80% !important; }
+  .table-carrinho { font-size: 11px }
+  .btn-avancar-carrinho { width: 55% !important;}
+  .btn-avancar-carrinho i { font-size: 50px !important; }
+  .btn-avancar-carrinho span { bottom: 11px !important; }
 }
 
 @media (max-width: 425px) /* Mobile */ {

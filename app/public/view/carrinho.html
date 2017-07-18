@@ -1,0 +1,54 @@
+<navbar></navbar>
+
+<section class="container">
+  <div class="row">
+    <div class="col-md-10 col-md-offset-1">
+      <h2 class="uma-linha-text">Informações da compra{{' - ' + carrinho.titulo}}</h2>
+
+      <div class="table-responsive">
+        <table class="table table-carrinho">
+          <tr>
+            <th width="15%">Data</th>
+            <th width="40%">Ingresso</th>
+            <th class="text-center">Qtd</th>
+            <th class="text-right">V. Unitário</th>
+            <th class="text-right">V. Total</th>
+          </tr>
+          <tr ng-repeat="ingresso in carrinho.ingressos">
+            <td>{{ingresso.data | date : 'dd/MM/yyyy'}}</td>
+            <td>{{ingresso.nome}}</td>
+            <td class="text-center">{{ingresso.quantidade}}</td>
+            <td class="text-right">{{ingresso.valor | currency}}</td>
+            <td class="text-right">{{ingresso.valor * ingresso.quantidade | currency}}</td>
+          </tr>
+          <tr>
+            <td colspan="5"></td>
+          </tr>
+        </table>
+      </div>
+      <div class="row">
+        <div class="col-md-5 col-md-offset-7">
+          <div class="table-responsive">
+            <table class="table table-carrinho">
+              <tr>
+                <td colspan="2">Taxa do serviço</td>
+                <td class="text-right">{{total_voucher * carrinho.taxa | currency}}</td>
+              </tr>
+              <tr>
+                <td colspan="2"><strong>Total</strong></td>
+                <td class="text-right">{{total_voucher + total_voucher * carrinho.taxa | currency}}</td>
+              </tr>
+              <tr>
+                <td colspan="3"></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <a href="#" class="btn btn-avancar-carrinho"><span>Avançar</span> <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+    </div>
+  </div>
+</section>
+
+<btn-ajuda></btn-ajuda>

@@ -1,6 +1,6 @@
 angular.module("ingressosCariri").controller('eventoCtrl', funcCtrl)
 
-function funcCtrl($scope,$routeParams,$rootScope,$location,$anchorScroll){
+function funcCtrl($scope,$routeParams,$rootScope,$location,$anchorScroll,$cookieStore){
   $rootScope.pos_titulo = $routeParams.titulo + ' - Ingressos Cariri'
   $scope.ingressoShow = 0
 
@@ -16,11 +16,11 @@ function funcCtrl($scope,$routeParams,$rootScope,$location,$anchorScroll){
     mapa: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3957.40824117053!2d-39.304664085679555!3d-7.307949594725646!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x7a177cb1dc3881f%3A0xc2fdccdcc5e44682!2sR.+Pero+Coelho%2C+196+-+Centro%2C+Barbalha+-+CE%2C+63180-000!5e0!3m2!1spt-BR!2sbr!4v1499230950761",
     estado: "CE",
     local: "Parque da Cidade",
-    taxa: 0.15,
+    taxa: 0.08,
     periodo: [{
       data: "2017-07-07T00:00",
       hora: "22:00",
-      atracao: "Jorge e Matheus, Safadão",
+      atracao: "Safadão",
       lote: 1,
       categoria: [{
         nome: "VIP - Inteira",
@@ -30,36 +30,69 @@ function funcCtrl($scope,$routeParams,$rootScope,$location,$anchorScroll){
         nome: "VIP - Meia",
         valor: 30.00,
         quantidade: 50
+      },{
+        nome: "Pista - Inteira",
+        valor: 60.00,
+        quantidade: 100
+      },{
+        nome: "Pista - Meia",
+        valor: 30.00,
+        quantidade: 50
       }],
-    }],
+    },{
+      data: "2017-07-09T00:00",
+      hora: "22:00",
+      atracao: "Aviões do forró",
+      lote: 1,
+      categoria: [{
+        nome: "VIP",
+        valor: 60.00,
+        quantidade: 100
+      },{
+        nome: "Pista",
+        valor: 30.00,
+        quantidade: 50
+      }],
+    },{
+      data: "2017-07-10T00:00",
+      hora: "22:00",
+      atracao: "Jorge e Matheus",
+      lote: 1,
+      categoria: [{
+        nome: "VIP",
+        valor: 60.00,
+        quantidade: 100
+      },{
+        nome: "Pista",
+        valor: 30.00,
+        quantidade: 50
+      }],
+    }]
   }
 
-  $scope.ingressos = [{
-    data: "2017-07-07T00:00",
-    hora: "22:00",
-    atracao: "Jorge e Matheus, Safadão",
-    categoria: [{
-      nome: "VIP - Inteira",
-      valor: 100.00,
-      quantidade: 100
-    },{
-      nome: "VIP - Meia",
-      valor: 60.00,
-      quantidade: 50
-    }],
-  },{
-    data: "2017-07-08T00:00",
-    hora: "22:00",
-    atracao: "Mayara e Maraisa, Pablo",
-    lote: 1,
-    categoria: [{
-      nome: "VIP - Inteira",
-      valor: 60.00,
-      quantidade: 120
-    },{
-      nome: "VIP - Meia",
-      valor: 30.00,
-      quantidade: 100
-    }],
-  }]
+  $scope.comprar_ingressos = function () {
+    voucher = {
+      'titulo': $scope.evento.titulo,
+      'taxa': $scope.evento.taxa,
+      'ingressos': []
+    }
+
+    $scope.evento.periodo.map(function(periodo){
+      periodo.categoria.map(function(categoria){
+        if(categoria.quantidade > 0){
+          pedido = {
+            'data': periodo.data,
+            'atracao': periodo.atracao,
+            'nome': categoria.nome,
+            'valor': categoria.valor,
+            'quantidade': categoria.quantidade
+          }
+          voucher.ingressos.push(pedido)
+        }
+      })
+    })
+
+    $cookieStore.put('carrinho', voucher)
+    $location.path('carrinho')
+  }
 }
