@@ -1,4 +1,4 @@
-package utils
+package settings
 
 import (
 	"encoding/json"
@@ -6,11 +6,6 @@ import (
 	"io/ioutil"
 	"os"
 	"strconv"
-	"time"
-
-	"github.com/gorilla/securecookie"
-	"github.com/kataras/iris/context"
-	"github.com/kataras/iris/sessions"
 )
 
 type Settings struct {
@@ -28,23 +23,14 @@ type Connection struct {
 	Host        string `json:"host"`
 	User        string `json:"user"`
 	Pass        string `json:"pass"`
-	Name        string `json:"name"`
+	Database    string `json:"database"`
 	MaxOpenConn int    `json:"maxOpenConn"`
 	MaxIdleConn int    `json:"maxIdleConn"`
 }
 
 var (
-	Regex = map[string]string{
-		"integer": "[0-9]+",
-		"string":  "",
-	}
-)
-
-var (
-	environments = map[string]string{"production": "api/utils/prod.json", "development": "api/utils/dev.json"}
+	environments = map[string]string{"production": "api/utils/settings/prod.json", "development": "api/utils/settings/dev.json"}
 	settings     Settings
-	session      *sessions.Sessions
-	ctx          context.Context
 	env          string
 )
 
@@ -59,12 +45,10 @@ func init() {
 		env = "development"
 	}
 	loadSettingsByEnv(env)
-	loadSession()
 }
 
 // loadSettingsByEnv Receber as configurações do json, correspondente ao env, e setar no struct
 func loadSettingsByEnv(env string) {
-
 	content, err := ioutil.ReadFile(environments[env])
 	if err != nil {
 		if GoDetails, _ := strconv.ParseBool(os.Getenv("GO_DETAILS")); GoDetails {
@@ -84,30 +68,7 @@ func loadSettingsByEnv(env string) {
 	}
 }
 
-func loadSession() {
-	cookieName := settings.CookieName
-	hashKey := []byte(settings.HashKey)
-	blockKey := []byte(settings.BlockKey)
-	secureCookie := securecookie.New(hashKey, blockKey)
-
-	session = sessions.New(sessions.Config{
-		Cookie:  cookieName,
-		Encode:  secureCookie.Encode,
-		Decode:  secureCookie.Decode,
-		Expires: 5 * time.Minute,
-	})
-}
-
 // GetSettings Retorna as configurações
 func GetSettings() Settings {
 	return settings
-}
-
-func GetSession() *sessions.Sessions {
-	return session
-}
-
-// IsTestEnvironment Teste
-func IsTestEnvironment() bool {
-	return env == "tests"
 }
