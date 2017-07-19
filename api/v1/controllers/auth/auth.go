@@ -1,13 +1,13 @@
 package auth
 
 import (
-	"github.com/JoaoEymard/ingressoscariri/api/utils"
+	"github.com/JoaoEymard/ingressoscariri/api/utils/session"
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/context"
 )
 
 func Check(ctx context.Context) {
-	sess := utils.GetSession().Start(ctx)
+	sess := session.GetSession().Start(ctx)
 	value, _ := sess.GetBoolean("sessionCript")
 	if value {
 		ctx.Next()
@@ -17,7 +17,7 @@ func Check(ctx context.Context) {
 
 func Login(ctx context.Context) {
 	if ctx.Params().Get("user") == "c019" && ctx.Params().Get("passw") == "admin" {
-		sess := utils.GetSession().Start(ctx)
+		sess := session.GetSession().Start(ctx)
 		sess.Set("sessionCript", true)
 		ctx.JSON(map[string]interface{}{"Login": "OK"})
 		return
@@ -27,7 +27,7 @@ func Login(ctx context.Context) {
 }
 
 func Logout(ctx context.Context) {
-	sess := utils.GetSession().Start(ctx)
+	sess := session.GetSession().Start(ctx)
 	if sess.Get("sessionCript") != nil {
 		sess.Delete("sessionCript")
 		ctx.JSON(map[string]interface{}{"Logout": "OK"})

@@ -1,21 +1,21 @@
 {
-	"listen": "0.0.0.0:3000",
-	"cookieName": "ingressoscariri",
+	"listen": "127.0.0.1:4001",
+	"cookieName": "development",
 	"hashKey": "the-big-and-secret-fash-key-here",
 	"blockKey": "lot-secret-of-characters-big-too",
 	"database": {
 		"connectionRw": {
 			"host": "localhost port=5432",
 			"user": "postgres",
-			"pass": "123456",
-			"name": "site",
+			"pass": "ro5hAth5@a&rafot",
+			"database": "ingressoscariri",
 			"maxOpenConn": 10
 		},
 		"connectionRo": {
 			"host": "localhost port=5432",
 			"user": "postgres",
-			"pass": "123456",
-			"name": "site",
+			"pass": "ro5hAth5@a&rafot",
+			"database": "ingressoscariri",
 			"maxOpenConn": 10
 		}
 	}
