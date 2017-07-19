@@ -1,5 +1,5 @@
 {
-	"listen": "127.0.0.1:3001",
+	"listen": "127.0.0.1:4001",
 	"cookieName": "development",
 	"hashKey": "the-big-and-secret-fash-key-here",
 	"blockKey": "lot-secret-of-characters-big-too",

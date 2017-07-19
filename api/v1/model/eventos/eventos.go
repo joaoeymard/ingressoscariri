@@ -1,8 +1,6 @@
 package eventos
 
 import (
-	"fmt"
-
 	"github.com/JoaoEymard/ingressoscariri/api/utils/database/postgres"
 )
 
@@ -96,23 +94,66 @@ func FindAll() ([]map[string]interface{}, error) {
 
 	}
 
+	var (
+		eventoAux    []map[string]interface{}
+		periodoAux   []map[string]interface{}
+		categoriaAux []map[string]interface{}
+		galeriaAux   []map[string]interface{}
+	)
+
 	for idEvento, evento := range eventos {
-		fmt.Println("Eventos", idEvento, evento)
+		// fmt.Println("Eventos", idEvento, evento)
 		for idPeriodo, periodo := range periodos {
 			if periodo.(map[string]interface{})["idEvento"] == idEvento {
-				fmt.Println("Periodo", periodo)
+				// fmt.Println("Periodo", periodo)
 				for _, categoria := range categorias {
 					if categoria.(map[string]interface{})["idPeriodo"] == idPeriodo {
-						fmt.Println("Categoria", categoria)
+						// fmt.Println("Categoria", categoria)
+						categoriaAux = append(categoriaAux, map[string]interface{}{
+							"nome":               categoria.(map[string]interface{})["nome"],
+							"valor":              categoria.(map[string]interface{})["valor"],
+							"quantidade":         categoria.(map[string]interface{})["quantidade"],
+							"quantidade_vendida": categoria.(map[string]interface{})["quantidade_vendida"],
+							"lote":               categoria.(map[string]interface{})["lote"],
+						})
 					}
 				}
+				periodoAux = append(periodoAux, map[string]interface{}{
+					"atracao":      periodo.(map[string]interface{})["atracao"],
+					"data_periodo": periodo.(map[string]interface{})["data_periodo"],
+					"categoria":    categoriaAux,
+				})
+				// fmt.Println(categoriaAux)
 			}
 		}
+
 		for _, galeria := range galerias {
 			if galeria.(map[string]interface{})["idEvento"] == idEvento {
-				fmt.Println("Galeria", galeria)
+				// fmt.Println("Galeria", galeria)
+				galeriaAux = append(galeriaAux, map[string]interface{}{
+					"imagem": galeria.(map[string]interface{})["imagem"],
+				})
 			}
 		}
+
+		// if periodoAux != nil && galeriaAux != nil {
+
+		eventoAux = append(eventoAux, map[string]interface{}{
+			"titulo":     evento.(map[string]interface{})["titulo"],
+			"imagem":     evento.(map[string]interface{})["imagem"],
+			"cidade":     evento.(map[string]interface{})["cidade"],
+			"uf":         evento.(map[string]interface{})["uf"],
+			"localidade": evento.(map[string]interface{})["localidade"],
+			"taxa":       evento.(map[string]interface{})["taxa"],
+			"mapa":       evento.(map[string]interface{})["mapa"],
+			"descricao":  evento.(map[string]interface{})["descricao"],
+			"periodo":    periodoAux,
+			"galeria":    galeriaAux,
+		})
+
+		// }
+		periodoAux, categoriaAux, galeriaAux = nil, nil, nil
+		// fmt.Println(eventoAux)
 	}
 
 	attributes = []string{"COUNT(*)"}
@@ -138,6 +179,6 @@ func FindAll() ([]map[string]interface{}, error) {
 		"data": jsonEventos,
 	})
 
-	return jsonEventos, nil
+	return eventoAux, nil
 
 }
