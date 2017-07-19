@@ -16,7 +16,7 @@
           </tr>
           <tr ng-repeat="ingresso in carrinho.ingressos">
             <td>{{ingresso.data | date : 'dd/MM/yyyy'}}</td>
-            <td>{{ingresso.nome}}</td>
+            <td>{{ingresso.nome}}<br>{{ingresso.atracao}}</td>
             <td class="text-center">{{ingresso.quantidade}}</td>
             <td class="text-right">{{ingresso.valor | currency}}</td>
             <td class="text-right">{{ingresso.valor * ingresso.quantidade | currency}}</td>
@@ -36,7 +36,7 @@
               </tr>
               <tr>
                 <td colspan="2"><strong>Total</strong></td>
-                <td class="text-right">{{total_voucher + total_voucher * carrinho.taxa | currency}}</td>
+                <td class="text-right"><strong>{{total_voucher + total_voucher * carrinho.taxa | currency}}</strong></td>
               </tr>
               <tr>
                 <td colspan="3"></td>
@@ -46,7 +46,11 @@
         </div>
       </div>
 
-      <a href="#" class="btn btn-avancar-carrinho"><span>Avançar</span> <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+      <h4 class="titulo-carrinho"><span>Informações do cliente</span></h4>
+
+      <h4 class="titulo-carrinho"><span>Informações de pagamento</span></h4>
+
+      <a href="#" class="btn btn-avancar-carrinho"><span>Concluir a compra </span> <i class="fa fa-angle-right" aria-hidden="true"></i></a>
     </div>
   </div>
 </section>

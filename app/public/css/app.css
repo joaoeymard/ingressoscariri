@@ -59,7 +59,7 @@ html, body {
   height: 80px;
 }
 .navbar-nav > li > a > i {
-  margin-right: 5px;
+  margin-left: 5px;
 }
 .navbar-nav > li:hover > a {
   color: var(--cor4) !important;
@@ -251,6 +251,22 @@ html, body {
   padding: 6px 20px;
 }
 
+
+.titulo-carrinho {
+  margin-bottom: 25px
+}
+.titulo-carrinho span {
+  background-color: var(--cor1);
+  padding-right: 10px;
+}
+.titulo-carrinho::after{
+  content: '';
+  width: 100%;
+  height: 1px;
+  display: block;
+  margin-top: -10px;
+  border-bottom: 2px var(--cor2) solid;
+}
 .btn-avancar-carrinho {
   width: 40%;
   border: 0;
