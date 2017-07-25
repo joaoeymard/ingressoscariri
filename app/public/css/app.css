@@ -35,7 +35,25 @@ html, body {
 .fa-2x {
   width: 28px;
 }
-.form-control { box-shadow: none !important }
+.form-control {
+  box-shadow: none !important;
+  border-radius: 0;
+}
+.form-control:focus {
+  border-color: var(--cor4) !important;
+}
+.espaco-bottom {
+  margin-bottom: 50px
+}
+.btn-cor4 {
+  background-color: var(--cor4);
+  color: #fff !important;
+  border-radius: 0;
+  padding: 6px 20px;
+  font-weight: 100;
+  letter-spacing: 1.5px;
+}
+
 /* Fim dos estilos gerais */
 
 .navbar {
@@ -243,14 +261,6 @@ html, body {
   outline: none;
   border-color: #ddd;
 }
-
-.btn-evento-comprar {
-  background-color: var(--cor4);
-  color: #fff !important;
-  border-radius: 0;
-  padding: 6px 20px;
-}
-
 
 .titulo-carrinho {
   margin-bottom: 25px

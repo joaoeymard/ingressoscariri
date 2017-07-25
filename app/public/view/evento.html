@@ -62,15 +62,20 @@
           <div style="clear: both"></div>
 
           <div class="text-right">
-            <a class="btn btn-evento-comprar" ng-click="comprar_ingressos()" >Comprar Ingressos</a>
+            <a class="btn btn-cor4" scroll-to="#header" duration="0" ng-click="comprar_ingressos()" >Comprar Ingressos</a>
           </div>
           <hr>
-
-          {{voucher}}
 
         </div>
 
       </div>
+      <p class="col-xs-12" style="margin-top: 5px">
+        <small>Anunciado em:</small> {{evento.anunciado | date : "dd 'de' MMMM 'de' yyyy"}}
+
+        <span class="pull-right">
+          <small>Compartilhar:</small>
+        </span>
+      </p>
     </div>
     <div class="col-md-4">
       <h4>Galeria do evento:</h4>
