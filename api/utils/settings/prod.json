@@ -1,5 +1,5 @@
 {
-	"listen": "0.0.0.0:3000",
+	"listen": "0.0.0.0:80",
 	"cookieName": "ingressoscariri",
 	"hashKey": "the-big-and-secret-fash-key-here",
 	"blockKey": "lot-secret-of-characters-big-too",
