@@ -22,7 +22,9 @@ func ConfigRoutes(route router.Party) {
 	route.Get("/map", ctrlAuth.Check, ctrlMapa.Find)
 
 	//Eventos
-	route.Get("/eventos", ctrlEventos.FindAll)
+	route.Post("/eventos", ctrlEventos.Insert)
+	route.Get("/eventos/", ctrlEventos.FindAll)
+	route.Get("/evento/{id:int min(1)}", ctrlEventos.FindByID)
 	// route.Get("/eventos/simples")
 	// route.Get("/eventos/{id:int}")
 
