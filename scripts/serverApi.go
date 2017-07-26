@@ -1,11 +1,14 @@
 package main
 
 import (
+	"fmt"
+	"os"
 	"runtime"
+	"strconv"
 
 	"github.com/JoaoEymard/ingressoscariri/api"
+	"github.com/JoaoEymard/ingressoscariri/api/utils/database/postgres"
 	"github.com/JoaoEymard/ingressoscariri/api/utils/settings"
-	//sql "github.com/JoaoEymard/ingressoscariri/service/core/database"
 
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/middleware/logger"
@@ -20,13 +23,13 @@ func init() {
 
 	app = iris.New()
 
-	/*	if err := sql.Open(); err != nil {
+	if err := postgres.Open(); err != nil {
 		if GoDetails, _ := strconv.ParseBool(os.Getenv("GO_DETAILS")); GoDetails {
 			fmt.Println("[Erro] Conexão Postgres", err.Error())
 		} else {
 			fmt.Println("[Erro] Open Postgres")
 		}
-	}*/
+	}
 
 	infoLogger := logger.New(logger.Config{
 		Status: true,
