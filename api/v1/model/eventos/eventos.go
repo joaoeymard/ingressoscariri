@@ -10,15 +10,117 @@ func FindAll() ([]map[string]interface{}, error) {
 	var (
 		eventos     = make(map[string]interface{})
 		periodos    = make(map[string]interface{})
-		categorias  = make(map[string]interface{})
-		galerias    = make(map[string]interface{})
 		jsonEventos []map[string]interface{}
 	)
 
-	if err := postgres.Open(); err != nil {
+	attributes := []string{
+		"evento.id AS id_evento", "evento.titulo", "evento.imagem", "evento.cidade", "evento.uf", "evento.localidade",
+		"periodo.id AS id_periodo", "periodo.data_periodo",
+	}
+
+	table := "t_ingressoscariri_evento AS evento"
+
+	join := []string{
+		"LEFT JOIN t_ingressoscariri_evento_periodo AS periodo ON evento.id = periodo.id_evento",
+	}
+
+	rows, err := postgres.Select(attributes, table, join, nil, nil, "")
+	if err != nil {
 		return nil, err
 	}
-	defer postgres.Close()
+
+	for rows.Next() {
+		var (
+			idEvento, idPeriodo                    string
+			titulo, imagem, cidade, uf, localidade interface{}
+			dataPeriodo                            interface{}
+		)
+
+		rows.Scan(&idEvento, &titulo, &imagem, &cidade, &uf, &localidade, &idPeriodo, &dataPeriodo)
+
+		eventos[idEvento] = map[string]interface{}{
+			"id":         idEvento,
+			"titulo":     titulo,
+			"imagem":     imagem,
+			"cidade":     cidade,
+			"uf":         uf,
+			"localidade": localidade,
+		}
+
+		if idPeriodo != "" {
+			periodos[idPeriodo] = map[string]interface{}{
+				"idEvento":     idEvento,
+				"id":           idPeriodo,
+				"data_periodo": dataPeriodo,
+			}
+		}
+
+	}
+
+	var (
+		eventoAux  []map[string]interface{}
+		periodoAux []map[string]interface{}
+	)
+
+	for idEvento, evento := range eventos {
+		for _, periodo := range periodos {
+			if periodo.(map[string]interface{})["idEvento"] == idEvento {
+				periodoAux = append(periodoAux, map[string]interface{}{
+					"data_periodo": periodo.(map[string]interface{})["data_periodo"],
+				})
+			}
+		}
+
+		eventoAux = append(eventoAux, map[string]interface{}{
+			"id":         evento.(map[string]interface{})["id"],
+			"titulo":     evento.(map[string]interface{})["titulo"],
+			"imagem":     evento.(map[string]interface{})["imagem"],
+			"cidade":     evento.(map[string]interface{})["cidade"],
+			"uf":         evento.(map[string]interface{})["uf"],
+			"localidade": evento.(map[string]interface{})["localidade"],
+			"periodo":    periodoAux,
+		})
+
+		periodoAux = nil
+	}
+
+	attributes = []string{"COUNT(*)"}
+	table = "t_ingressoscariri_evento"
+
+	rows, err = postgres.Select(attributes, table, nil, nil, nil, "")
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var count interface{}
+
+		rows.Scan(&count)
+
+		jsonEventos = append(jsonEventos, map[string]interface{}{
+			"total": count,
+		})
+
+	}
+
+	jsonEventos = append(jsonEventos, map[string]interface{}{
+		"data": eventoAux,
+	})
+
+	return jsonEventos, nil
+
+}
+
+// FindByID Retorna o evento correspondente ao id via json
+func FindByID(id string) (map[string]interface{}, error) {
+
+	var (
+		eventos    = make(map[string]interface{})
+		periodos   = make(map[string]interface{})
+		categorias = make(map[string]interface{})
+		galerias   = make(map[string]interface{})
+		jsonEvento map[string]interface{}
+	)
 
 	attributes := []string{
 		"evento.id AS id_evento", "evento.titulo", "evento.imagem", "evento.cidade", "evento.uf", "evento.localidade", "evento.taxa", "evento.mapa", "evento.descricao",
@@ -35,7 +137,15 @@ func FindAll() ([]map[string]interface{}, error) {
 		"LEFT JOIN t_ingressoscariri_evento_galeria AS galeria ON evento.id = galeria.id_evento",
 	}
 
-	rows, err := postgres.Select(attributes, table, join, nil, nil, "")
+	where := []string{
+		"evento.id = " + id,
+	}
+
+	order := []string{
+		"periodo.data_periodo ASC",
+	}
+
+	rows, err := postgres.Select(attributes, table, join, where, order, "")
 	if err != nil {
 		return nil, err
 	}
@@ -95,20 +205,19 @@ func FindAll() ([]map[string]interface{}, error) {
 	}
 
 	var (
-		eventoAux    []map[string]interface{}
+		eventoAux    map[string]interface{}
 		periodoAux   []map[string]interface{}
 		categoriaAux []map[string]interface{}
 		galeriaAux   []map[string]interface{}
 	)
 
 	for idEvento, evento := range eventos {
-		// fmt.Println("Eventos", idEvento, evento)
+		periodoAux = nil
 		for idPeriodo, periodo := range periodos {
+			categoriaAux = nil
 			if periodo.(map[string]interface{})["idEvento"] == idEvento {
-				// fmt.Println("Periodo", periodo)
 				for _, categoria := range categorias {
 					if categoria.(map[string]interface{})["idPeriodo"] == idPeriodo {
-						// fmt.Println("Categoria", categoria)
 						categoriaAux = append(categoriaAux, map[string]interface{}{
 							"nome":               categoria.(map[string]interface{})["nome"],
 							"valor":              categoria.(map[string]interface{})["valor"],
@@ -119,14 +228,14 @@ func FindAll() ([]map[string]interface{}, error) {
 					}
 				}
 				periodoAux = append(periodoAux, map[string]interface{}{
-					"atracao":      periodo.(map[string]interface{})["atracao"],
-					"data_periodo": periodo.(map[string]interface{})["data_periodo"],
-					"categoria":    categoriaAux,
+					"atracao":   periodo.(map[string]interface{})["atracao"],
+					"data":      periodo.(map[string]interface{})["data_periodo"],
+					"categoria": categoriaAux,
 				})
-				// fmt.Println(categoriaAux)
 			}
 		}
 
+		galeriaAux = nil
 		for _, galeria := range galerias {
 			if galeria.(map[string]interface{})["idEvento"] == idEvento {
 				// fmt.Println("Galeria", galeria)
@@ -136,49 +245,47 @@ func FindAll() ([]map[string]interface{}, error) {
 			}
 		}
 
-		// if periodoAux != nil && galeriaAux != nil {
-
-		eventoAux = append(eventoAux, map[string]interface{}{
-			"titulo":     evento.(map[string]interface{})["titulo"],
-			"imagem":     evento.(map[string]interface{})["imagem"],
-			"cidade":     evento.(map[string]interface{})["cidade"],
-			"uf":         evento.(map[string]interface{})["uf"],
-			"localidade": evento.(map[string]interface{})["localidade"],
-			"taxa":       evento.(map[string]interface{})["taxa"],
-			"mapa":       evento.(map[string]interface{})["mapa"],
-			"descricao":  evento.(map[string]interface{})["descricao"],
-			"periodo":    periodoAux,
-			"galeria":    galeriaAux,
-		})
-
-		// }
-		periodoAux, categoriaAux, galeriaAux = nil, nil, nil
-		// fmt.Println(eventoAux)
+		eventoAux = map[string]interface{}{
+			"id":           evento.(map[string]interface{})["id"],
+			"titulo":       evento.(map[string]interface{})["titulo"],
+			"imagem":       evento.(map[string]interface{})["imagem"],
+			"cidade":       evento.(map[string]interface{})["cidade"],
+			"estado":       evento.(map[string]interface{})["uf"],
+			"data_criacao": evento.(map[string]interface{})["localidade"],
+			"local":        evento.(map[string]interface{})["localidade"],
+			"taxa":         evento.(map[string]interface{})["taxa"],
+			"mapa":         evento.(map[string]interface{})["mapa"],
+			"descricao":    evento.(map[string]interface{})["descricao"],
+			"periodo":      periodoAux,
+			"galeria":      galeriaAux,
+		}
 	}
 
-	attributes = []string{"COUNT(*)"}
-	table = "t_ingressoscariri_evento"
+	jsonEvento = eventoAux
 
-	rows, err = postgres.Select(attributes, table, nil, nil, nil, "")
+	return jsonEvento, nil
+
+}
+
+// Insert Retorna os eventos via json
+func Insert() ([]map[string]interface{}, error) {
+
+	attributes := []string{
+		"titulo", "imagem", "cidade", "uf", "localidade", "taxa", "mapa", "descricao",
+	}
+
+	table := "t_ingressoscariri_evento"
+
+	values := [][]interface{}{
+		[]interface{}{"titulo1", "hash(imagem1)", "cidade1", "u1", "localidade1", 19.0, "mapa1", "descricao1"},
+		[]interface{}{"titulo2", "hash(imagem2)", "cidade2", "u2", "localidade2", 19.0, "mapa2", "descricao2"},
+	}
+
+	_, err := postgres.Insert(attributes, table, values)
 	if err != nil {
 		return nil, err
 	}
 
-	for rows.Next() {
-		var count interface{}
-
-		rows.Scan(&count)
-
-		jsonEventos = append(jsonEventos, map[string]interface{}{
-			"total": count,
-		})
-
-	}
-
-	jsonEventos = append(jsonEventos, map[string]interface{}{
-		"data": jsonEventos,
-	})
-
-	return eventoAux, nil
+	return nil, nil
 
 }
