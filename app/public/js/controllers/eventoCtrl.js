@@ -16,6 +16,7 @@ function funcCtrl($scope,$routeParams,$rootScope,$location,$anchorScroll,$cookie
     mapa: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3957.40824117053!2d-39.304664085679555!3d-7.307949594725646!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x7a177cb1dc3881f%3A0xc2fdccdcc5e44682!2sR.+Pero+Coelho%2C+196+-+Centro%2C+Barbalha+-+CE%2C+63180-000!5e0!3m2!1spt-BR!2sbr!4v1499230950761",
     estado: "CE",
     local: "Parque da Cidade",
+    anunciado: "2017-04-14T00:00",
     taxa: 0.08,
     periodo: [{
       data: "2017-07-07T00:00",
