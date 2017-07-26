@@ -47,9 +47,9 @@ func main() {
 
 	err := app.Run(iris.Addr(settings.GetSettings().Listen), iris.WithCharset("UTF-8"), iris.WithoutServerError(iris.ErrServerClosed))
 	if err != nil {
-		app.Logger().Errorln("Exiting the server, with error:", err.Error())
+		app.Logger().Error("Exiting the server, with error:", err.Error())
 		return
 	}
-	app.Logger().Infoln("Exiting the server...")
+	app.Logger().Info("Exiting the server...")
 
 }
