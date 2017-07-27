@@ -1,8 +1,6 @@
 package eventos
 
 import (
-	"fmt"
-
 	"github.com/JoaoEymard/ingressoscariri/api/v1/model/eventos"
 	"github.com/kataras/iris/context"
 )
@@ -21,6 +19,9 @@ func Insert(ctx context.Context) {
 
 // FindAll Retorna os eventos via json
 func FindAll(ctx context.Context) {
+
+	ctx.Header("Access-Control-Allow-Origin", "*")
+	ctx.Header("Access-Control-Allow-Methods", "GET")
 	jsonEventos, err := eventos.FindAll()
 	if err != nil {
 		ctx.JSON(map[string]interface{}{"Erro": err.Error()})
@@ -32,7 +33,9 @@ func FindAll(ctx context.Context) {
 
 // FindByID Retorna o evento correspondente ao id via json
 func FindByID(ctx context.Context) {
-	fmt.Println("id", ctx.Params().Get("id"))
+
+	ctx.Header("Access-Control-Allow-Origin", "*")
+	ctx.Header("Access-Control-Allow-Methods", "GET")
 	jsonEvento, err := eventos.FindByID(ctx.Params().Get("id"))
 	if err != nil {
 		ctx.JSON(map[string]interface{}{"Erro": err.Error()})
@@ -40,4 +43,5 @@ func FindByID(ctx context.Context) {
 	}
 
 	ctx.JSON(jsonEvento)
+
 }
