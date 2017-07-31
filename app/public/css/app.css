@@ -177,7 +177,10 @@ html, body {
   background-color: var(--cor4);
   color: #fff;
 }
-.nav-menu-top-box-evento .btn i { margin-right: 5px }
+.nav-menu-top-box-evento .btn i {
+  margin-right: 5px;
+  margin-left: -5px;
+}
 .nav-menu-periodo-evento {
   flex-wrap: wrap;
   justify-content: flex-start;

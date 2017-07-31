@@ -1,21 +1,21 @@
 <div class="col-sm-6">
   <div class="card-evento animacao">
-    <img src="img/{{evento.img}}" alt="Um show" class="img-responsive">
+    <img src="{{evento.imagem}}" alt="Um show" class="img-responsive">
     <div class="info-card-evento">
       <h4 class="uma-linha-text">{{evento.titulo}}</h4>
 
       <table class="table table-card-evento text-center">
         <tr>
-          <td class="uma-linha-text"><i class="fa fa-calendar pull-left" aria-hidden="true"></i> {{evento.data}}</td>
-          <td class="uma-linha-text"><i class="fa fa-globe pull-left" aria-hidden="true"></i> {{evento.cidade}} - {{evento.estado}}</td>
+          <td class="uma-linha-text"><i class="fa fa-calendar pull-left" aria-hidden="true"></i> {{evento.data | date : "shortDate"}}</td>
+          <td class="uma-linha-text"><i class="fa fa-globe pull-left" aria-hidden="true"></i> {{evento.cidade}} - {{evento.uf}}</td>
         </tr>
         <tr>
-          <td class="uma-linha-text"><i class="fa fa-clock-o pull-left" aria-hidden="true"></i> {{evento.hora}}</td>
+          <td class="uma-linha-text"><i class="fa fa-clock-o pull-left" aria-hidden="true"></i> {{evento.data | date : "shortTime"}}</td>
           <td class="uma-linha-text"><i class="fa fa-map-marker pull-left" aria-hidden="true"></i> {{evento.local}}</td>
         </tr>
       </table>
     </div>
 
-    <a scroll-to="#header" duration="0" ng-href="#evento/{{evento.titulo}}" class="btn btn-card-evento animacao">Comprar</a>
+    <a scroll-to="#header" duration="0" ng-href="#evento/{{evento.link}}" class="btn btn-card-evento animacao">Comprar</a>
   </div>
 </div>
