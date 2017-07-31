@@ -1,6 +1,6 @@
 <navbar></navbar>
 
-<header class="box-img-banner-evento" style="background-image: url('./img/{{evento.img}}')">
+<header class="box-img-banner-evento" style="background-image: url('{{evento.imagem}}')">
   <div class="filter-banner-evento"></div>
 </header>
 
@@ -9,19 +9,19 @@
     <div class="col-md-8">
       <div class="box-evento-info">
         <div class="nav-menu-top-box-evento">
-          <a class="btn vertical-center animacao"><i class="fa fa-map-marker fa-2x" aria-hidden="true"></i> <span class="hidden-xs">{{evento.cidade}}</span></a>
-          <a class="btn vertical-center animacao"><i class="fa fa-location-arrow fa-2x" aria-hidden="true"></i> <span class="hidden-xs">Traçar rota</span></a>
-          <a scroll-to="#periodo-evento" offset="20" duration="200" class="btn btn-comprar vertical-center animacao"><i class="fa fa-shopping-cart fa-2x" aria-hidden="true"></i> Comprar agora</a>
+          <a class="btn vertical-center animacao"><i class="fa fa-file-text" aria-hidden="true"></i> Imprimir Voucher</a>
+          <a scroll-to="#periodo-evento" offset="20" duration="200" class="btn btn-comprar vertical-center animacao"><i class="fa fa-ticket fa-2x" aria-hidden="true"></i> Comprar agora</a>
         </div>
 
         <div style="padding: 0 15px">
           <h1>{{evento.titulo}}</h1>
 
           <div class="box-evento-descricao">
-            <div class="col-sm-7 pull-right">
+            <div class="col-sm-7 pull-right" ng-if="evento.mapa">
               <iframe src="{{evento.mapa | trustAsResourceUrl}}" class="box-evento-mapa" width="100%" height="150" frameborder="0" style="border:0" allowfullscreen></iframe>
             </div>
             {{evento.descricao}}
+            <div style="clear: both;"></div>
           </div>
 
           <hr id="periodo-evento">
@@ -45,7 +45,7 @@
               <div class="table-responsive">
                 <table class="table table-condensed table-categoria-ingresso" ng-init="min = 0; max = 5;">
                   <tr ng-repeat="categoria in periodo.categoria">
-                    <td>{{categoria.nome}}<br><span class="text-success">{{categoria.valor}}</span></td>
+                    <td>{{categoria.nome}}<br><span class="text-success">{{categoria.valor | currency}}</span></td>
                     <td class="box-qtd">
                       <div class="input-group qtd-ingressos" data-ng-init="categoria.quantidade = 0">
                         <span class="input-group-addon menos btn" ng-click="categoria.quantidade > min ? categoria.quantidade = categoria.quantidade-1 : categoria.quantidade">-</span>
@@ -70,7 +70,7 @@
 
       </div>
       <p class="col-xs-12" style="margin-top: 5px">
-        <small>Anunciado em:</small> {{evento.anunciado | date : "dd 'de' MMMM 'de' yyyy"}}
+        <small>Anunciado em:</small> {{evento.data_criacao | date : "dd 'de' MMMM 'de' yyyy"}}
 
         <span class="pull-right">
           <small>Compartilhar:</small>

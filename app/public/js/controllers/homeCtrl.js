@@ -1,40 +1,11 @@
 angular.module("ingressosCariri").controller('homeCtrl', funcCtrl)
 
-function funcCtrl($scope, $rootScope){
+function funcCtrl($scope, $rootScope, Evento){
   $rootScope.pos_titulo = 'Ingressos Cariri'
-  $scope.eventos = [
-    {
-      titulo: "Uma festa qualquer",
-      img: "evento.png",
-      data: "02/07/2017",
-      hora: "22:00",
-      cidade: "Juazeiro do Norte",
-      estado: "CE",
-      local: "Parque da Cidade"
-    },{
-      titulo: "Uma festa qualquer",
-      img: "evento.png",
-      data: "02/07/2017",
-      hora: "22:00",
-      cidade: "Juazeiro do Norte",
-      estado: "CE",
-      local: "Parque da Cidade"
-    },{
-      titulo: "Uma festa qualquer",
-      img: "evento.png",
-      data: "02/07/2017",
-      hora: "22:00",
-      cidade: "Juazeiro do Norte",
-      estado: "CE",
-      local: "Parque da Cidade"
-    },{
-      titulo: "Uma festa qualquer",
-      img: "evento.png",
-      data: "02/07/2017",
-      hora: "22:00",
-      cidade: "Juazeiro do Norte",
-      estado: "CE",
-      local: "Parque da Cidade"
-    }
-  ]
+
+  Evento.get_all().then(function success (res){
+    $scope.eventos = res.data
+  },function error(res){
+    console.log("error: "+res.data);
+  })
 }

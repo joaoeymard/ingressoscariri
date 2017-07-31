@@ -1,4 +1,4 @@
-angular.module("ingressosCariri").config(function ($routeProvider, $locationProvider) {
+angular.module("ingressosCariri").config(function ($routeProvider, $httpProvider, $locationProvider) {
   $routeProvider
 
   .when("/", {
@@ -9,12 +9,12 @@ angular.module("ingressosCariri").config(function ($routeProvider, $locationProv
     templateUrl: "view/evento.html",
     controller: "eventoCtrl"
   })
-  .when("/ajuda", {
-    templateUrl: "view/ajuda.html"
-  })
   .when("/carrinho", {
     templateUrl: "view/carrinho.html",
     controller: "carrinhoCtrl"
+  })
+  .when("/ajuda", {
+    templateUrl: "view/ajuda.html"
   })
 
   .when("/erro", {
