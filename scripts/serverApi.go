@@ -11,6 +11,7 @@ import (
 	"github.com/JoaoEymard/ingressoscariri/api/utils/settings"
 
 	"github.com/kataras/iris"
+	"github.com/kataras/iris/context"
 	"github.com/kataras/iris/middleware/logger"
 )
 
@@ -36,6 +37,12 @@ func init() {
 		IP:     true,
 		Method: true,
 		Path:   true,
+	})
+
+	app.ContextPool = context.New(func() context.Context {
+		ctx := context.NewContext(app)
+		ctx.Header("Access-Control-Allow-Origin", "*")
+		return ctx
 	})
 
 	app.Use(infoLogger)

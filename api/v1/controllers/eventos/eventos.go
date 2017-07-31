@@ -8,23 +8,26 @@ import (
 // Insert Responsavel por Inserir o registro
 func Insert(ctx context.Context) {
 
-	jsonEventos, err := eventos.Insert()
-	if err != nil {
-		ctx.JSON(map[string]interface{}{"Erro": err.Error()})
-		return
-	}
+	// jsonEventos, statusCode, err := eventos.Insert()
+	// ctx.StatusCode(statusCode)
 
-	ctx.JSON(jsonEventos)
+	// if err != nil {
+	// 	ctx.JSON(err.Error())
+	// 	return
+	// }
+
+	// ctx.JSON(jsonEventos)
+	ctx.JSON("1")
 }
 
 // FindAll Retorna os eventos via json
 func FindAll(ctx context.Context) {
 
-	ctx.Header("Access-Control-Allow-Origin", "*")
-	ctx.Header("Access-Control-Allow-Methods", "GET")
-	jsonEventos, err := eventos.FindAll()
+	jsonEventos, statusCode, err := eventos.FindAll()
+	ctx.StatusCode(statusCode)
+
 	if err != nil {
-		ctx.JSON(map[string]interface{}{"Erro": err.Error()})
+		ctx.JSON(err.Error())
 		return
 	}
 
@@ -34,11 +37,11 @@ func FindAll(ctx context.Context) {
 // FindByID Retorna o evento correspondente ao id via json
 func FindByID(ctx context.Context) {
 
-	ctx.Header("Access-Control-Allow-Origin", "*")
-	ctx.Header("Access-Control-Allow-Methods", "GET")
-	jsonEvento, err := eventos.FindByID(ctx.Params().Get("id"))
+	jsonEvento, statusCode, err := eventos.FindByID(ctx.Params().Get("link"))
+	ctx.StatusCode(statusCode)
+
 	if err != nil {
-		ctx.JSON(map[string]interface{}{"Erro": err.Error()})
+		ctx.JSON(err.Error())
 		return
 	}
 

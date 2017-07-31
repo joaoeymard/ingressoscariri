@@ -1,20 +1,46 @@
 package eventos
 
 import (
+	"errors"
+	"strings"
+
 	"github.com/JoaoEymard/ingressoscariri/api/utils/database/postgres"
+	"github.com/kataras/iris"
 )
 
+// Insert Retorna os eventos via json
+func Insert() ([]map[string]interface{}, int, error) {
+
+	attributes := []string{
+		"titulo", "imagem", "cidade", "uf", "localidade", "taxa", "mapa", "descricao",
+	}
+
+	table := "t_ingressoscariri_evento"
+
+	values := [][]interface{}{
+		[]interface{}{"titulo1", "hash(imagem1)", "cidade1", "u1", "localidade1", 19.0, "mapa1", "descricao1"},
+	}
+
+	_, err := postgres.Insert(attributes, table, values)
+	if err != nil {
+		return nil, iris.StatusBadRequest, err
+	}
+
+	return nil, iris.StatusOK, nil
+
+}
+
 // FindAll Retorna os eventos via json
-func FindAll() ([]map[string]interface{}, error) {
+func FindAll() ([]map[string]interface{}, int, error) {
 
 	var (
-		eventos     = make(map[string]interface{})
-		periodos    = make(map[string]interface{})
+		eventos     []map[string]interface{}
+		periodos    []map[string]interface{}
 		jsonEventos []map[string]interface{}
 	)
 
 	attributes := []string{
-		"evento.id AS id_evento", "evento.titulo", "evento.imagem", "evento.cidade", "evento.uf", "evento.localidade",
+		"evento.id AS id_evento", "evento.titulo", "evento.imagem", "evento.cidade", "evento.uf", "evento.localidade", "evento.link",
 		"periodo.id AS id_periodo", "periodo.data_periodo",
 	}
 
@@ -24,95 +50,83 @@ func FindAll() ([]map[string]interface{}, error) {
 		"LEFT JOIN t_ingressoscariri_evento_periodo AS periodo ON evento.id = periodo.id_evento",
 	}
 
-	rows, err := postgres.Select(attributes, table, join, nil, nil, "")
-	if err != nil {
-		return nil, err
+	order := []string{
+		"evento.id ASC, periodo.data_periodo ASC",
 	}
+
+	rows, err := postgres.Select(attributes, table, join, nil, order, "")
+	if err != nil {
+		return nil, iris.StatusBadRequest, errors.New("Bad Request: " + err.Error())
+	}
+
+	var oldEvento string
 
 	for rows.Next() {
 		var (
-			idEvento, idPeriodo                    string
-			titulo, imagem, cidade, uf, localidade interface{}
-			dataPeriodo                            interface{}
+			idEvento, idPeriodo                          string
+			titulo, imagem, cidade, uf, localidade, link interface{}
+			dataPeriodo                                  interface{}
 		)
 
-		rows.Scan(&idEvento, &titulo, &imagem, &cidade, &uf, &localidade, &idPeriodo, &dataPeriodo)
+		rows.Scan(&idEvento, &titulo, &imagem, &cidade, &uf, &localidade, &link, &idPeriodo, &dataPeriodo)
 
-		eventos[idEvento] = map[string]interface{}{
-			"id":         idEvento,
-			"titulo":     titulo,
-			"imagem":     imagem,
-			"cidade":     cidade,
-			"uf":         uf,
-			"localidade": localidade,
-		}
+		if eventos == nil || !strings.EqualFold(oldEvento, idEvento) {
+			oldEvento = idEvento
+			eventos = append(eventos, map[string]interface{}{
+				"id":         idEvento,
+				"titulo":     titulo,
+				"imagem":     imagem,
+				"cidade":     cidade,
+				"uf":         uf,
+				"localidade": localidade,
+				"link":       link,
+			})
 
-		if idPeriodo != "" {
-			periodos[idPeriodo] = map[string]interface{}{
-				"idEvento":     idEvento,
-				"id":           idPeriodo,
-				"data_periodo": dataPeriodo,
+			if idPeriodo != "" {
+				periodos = append(periodos, map[string]interface{}{
+					"idEvento":     idEvento,
+					"id":           idPeriodo,
+					"data_periodo": dataPeriodo,
+				})
 			}
 		}
 
 	}
 
 	var (
-		eventoAux  []map[string]interface{}
-		periodoAux []map[string]interface{}
+		periodoAux interface{}
 	)
 
-	for idEvento, evento := range eventos {
+	for _, evento := range eventos {
+		periodoAux = nil
 		for _, periodo := range periodos {
-			if periodo.(map[string]interface{})["idEvento"] == idEvento {
-				periodoAux = append(periodoAux, map[string]interface{}{
-					"data_periodo": periodo.(map[string]interface{})["data_periodo"],
-				})
+			if periodo["idEvento"] == evento["id"] {
+				periodoAux = periodo["data_periodo"]
+				break
 			}
 		}
 
-		eventoAux = append(eventoAux, map[string]interface{}{
-			"id":         evento.(map[string]interface{})["id"],
-			"titulo":     evento.(map[string]interface{})["titulo"],
-			"imagem":     evento.(map[string]interface{})["imagem"],
-			"cidade":     evento.(map[string]interface{})["cidade"],
-			"uf":         evento.(map[string]interface{})["uf"],
-			"localidade": evento.(map[string]interface{})["localidade"],
-			"periodo":    periodoAux,
-		})
-
-		periodoAux = nil
-	}
-
-	attributes = []string{"COUNT(*)"}
-	table = "t_ingressoscariri_evento"
-
-	rows, err = postgres.Select(attributes, table, nil, nil, nil, "")
-	if err != nil {
-		return nil, err
-	}
-
-	for rows.Next() {
-		var count interface{}
-
-		rows.Scan(&count)
-
 		jsonEventos = append(jsonEventos, map[string]interface{}{
-			"total": count,
+			"titulo": evento["titulo"],
+			"imagem": evento["imagem"],
+			"cidade": evento["cidade"],
+			"uf":     evento["uf"],
+			"local":  evento["localidade"],
+			"link":   evento["link"],
+			"data":   periodoAux,
 		})
-
 	}
 
-	jsonEventos = append(jsonEventos, map[string]interface{}{
-		"data": eventoAux,
-	})
+	if jsonEventos == nil {
+		return nil, iris.StatusNotFound, errors.New("Not Found: Id não encontrado")
+	}
 
-	return jsonEventos, nil
+	return jsonEventos, iris.StatusOK, nil
 
 }
 
 // FindByID Retorna o evento correspondente ao id via json
-func FindByID(id string) (map[string]interface{}, error) {
+func FindByID(link string) (map[string]interface{}, int, error) {
 
 	var (
 		eventos    = make(map[string]interface{})
@@ -123,9 +137,9 @@ func FindByID(id string) (map[string]interface{}, error) {
 	)
 
 	attributes := []string{
-		"evento.id AS id_evento", "evento.titulo", "evento.imagem", "evento.cidade", "evento.uf", "evento.localidade", "evento.taxa", "evento.mapa", "evento.descricao",
-		"periodo.id AS id_periodo", "periodo.data_periodo", "periodo.atracao", "periodo.lote",
-		"categoria.id AS id_categoria", "categoria.nome", "categoria.valor", "categoria.quantidade", "categoria.quantidade_vendida",
+		"evento.id AS id_evento", "evento.titulo", "evento.imagem", "evento.cidade", "evento.uf", "evento.localidade", "evento.taxa", "evento.mapa", "evento.descricao", "evento.link",
+		"periodo.id AS id_periodo", "periodo.data_periodo", "periodo.atracao",
+		"categoria.id AS id_categoria", "categoria.nome", "categoria.valor", "categoria.quantidade", "categoria.quantidade_vendida", "categoria.lote",
 		"galeria.id AS id_galeria", "galeria.imagem",
 	}
 
@@ -138,7 +152,7 @@ func FindByID(id string) (map[string]interface{}, error) {
 	}
 
 	where := []string{
-		"evento.id = " + id,
+		"evento.link LIKE '" + link + "'",
 	}
 
 	order := []string{
@@ -147,19 +161,19 @@ func FindByID(id string) (map[string]interface{}, error) {
 
 	rows, err := postgres.Select(attributes, table, join, where, order, "")
 	if err != nil {
-		return nil, err
+		return nil, iris.StatusBadRequest, errors.New("Bad Request: " + err.Error())
 	}
 
 	for rows.Next() {
 		var (
-			idEvento, idPeriodo, idCategoria, idGaleria                   string
-			titulo, imagem, cidade, uf, localidade, taxa, mapa, descricao interface{}
-			dataPeriodo, atracao, lote                                    interface{}
-			nomeCategoria, valor, quantidade, quantidadeVendida           interface{}
-			imagemGaleria                                                 interface{}
+			idEvento, idPeriodo, idCategoria, idGaleria                         string
+			titulo, imagem, cidade, uf, localidade, taxa, mapa, descricao, link interface{}
+			dataPeriodo, atracao, lote                                          interface{}
+			nomeCategoria, valor, quantidade, quantidadeVendida                 interface{}
+			imagemGaleria                                                       interface{}
 		)
 
-		rows.Scan(&idEvento, &titulo, &imagem, &cidade, &uf, &localidade, &taxa, &mapa, &descricao, &idPeriodo, &dataPeriodo, &atracao, &lote, &idCategoria, &nomeCategoria, &valor, &quantidade, &quantidadeVendida, &idGaleria, &imagemGaleria)
+		rows.Scan(&idEvento, &titulo, &imagem, &cidade, &uf, &localidade, &taxa, &mapa, &descricao, &link, &idPeriodo, &dataPeriodo, &atracao, &lote, &idCategoria, &nomeCategoria, &valor, &quantidade, &quantidadeVendida, &idGaleria, &imagemGaleria)
 
 		eventos[idEvento] = map[string]interface{}{
 			"id":         idEvento,
@@ -171,6 +185,7 @@ func FindByID(id string) (map[string]interface{}, error) {
 			"taxa":       taxa,
 			"mapa":       mapa,
 			"descricao":  descricao,
+			"link":       link,
 		}
 
 		if idPeriodo != "" {
@@ -246,46 +261,26 @@ func FindByID(id string) (map[string]interface{}, error) {
 		}
 
 		eventoAux = map[string]interface{}{
-			"id":           evento.(map[string]interface{})["id"],
-			"titulo":       evento.(map[string]interface{})["titulo"],
-			"imagem":       evento.(map[string]interface{})["imagem"],
-			"cidade":       evento.(map[string]interface{})["cidade"],
-			"estado":       evento.(map[string]interface{})["uf"],
-			"data_criacao": evento.(map[string]interface{})["localidade"],
-			"local":        evento.(map[string]interface{})["localidade"],
-			"taxa":         evento.(map[string]interface{})["taxa"],
-			"mapa":         evento.(map[string]interface{})["mapa"],
-			"descricao":    evento.(map[string]interface{})["descricao"],
-			"periodo":      periodoAux,
-			"galeria":      galeriaAux,
+			"titulo":    evento.(map[string]interface{})["titulo"],
+			"imagem":    evento.(map[string]interface{})["imagem"],
+			"cidade":    evento.(map[string]interface{})["cidade"],
+			"estado":    evento.(map[string]interface{})["uf"],
+			"local":     evento.(map[string]interface{})["localidade"],
+			"taxa":      evento.(map[string]interface{})["taxa"],
+			"mapa":      evento.(map[string]interface{})["mapa"],
+			"descricao": evento.(map[string]interface{})["descricao"],
+			"link":      evento.(map[string]interface{})["link"],
+			"periodo":   periodoAux,
+			"galeria":   galeriaAux,
 		}
 	}
 
 	jsonEvento = eventoAux
 
-	return jsonEvento, nil
-
-}
-
-// Insert Retorna os eventos via json
-func Insert() ([]map[string]interface{}, error) {
-
-	attributes := []string{
-		"titulo", "imagem", "cidade", "uf", "localidade", "taxa", "mapa", "descricao",
+	if jsonEvento == nil {
+		return nil, iris.StatusNotFound, errors.New("Not Found: Id não encontrado")
 	}
 
-	table := "t_ingressoscariri_evento"
-
-	values := [][]interface{}{
-		[]interface{}{"titulo1", "hash(imagem1)", "cidade1", "u1", "localidade1", 19.0, "mapa1", "descricao1"},
-		[]interface{}{"titulo2", "hash(imagem2)", "cidade2", "u2", "localidade2", 19.0, "mapa2", "descricao2"},
-	}
-
-	_, err := postgres.Insert(attributes, table, values)
-	if err != nil {
-		return nil, err
-	}
-
-	return nil, nil
+	return jsonEvento, iris.StatusOK, nil
 
 }

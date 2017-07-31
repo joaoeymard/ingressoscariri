@@ -24,7 +24,7 @@ func ConfigRoutes(route router.Party) {
 	//Eventos
 	route.Post("/eventos", ctrlEventos.Insert)
 	route.Get("/eventos/", ctrlEventos.FindAll)
-	route.Get("/evento/{id:int min(1)}", ctrlEventos.FindByID)
+	route.Get("/evento/{link:string regexp(^[a-zA-Z0-9_]+?)}", ctrlEventos.FindByID)
 	// route.Get("/eventos/simples")
 	// route.Get("/eventos/{id:int}")
 
