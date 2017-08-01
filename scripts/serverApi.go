@@ -11,7 +11,6 @@ import (
 	"github.com/JoaoEymard/ingressoscariri/api/utils/settings"
 
 	"github.com/kataras/iris"
-	"github.com/kataras/iris/context"
 	"github.com/kataras/iris/middleware/logger"
 )
 
@@ -21,6 +20,12 @@ var (
 
 func init() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
+
+	// iris.WithConfiguration(iris.Configuration{RemoteAddrHeaders: map[string]bool{
+	// 	"X-Real-Ip":        false,
+	// 	"X-Forwarded-For":  false,
+	// 	"CF-Connecting-IP": false,
+	// }})
 
 	app = iris.New()
 
@@ -39,12 +44,6 @@ func init() {
 		Path:   true,
 	})
 
-	app.ContextPool = context.New(func() context.Context {
-		ctx := context.NewContext(app)
-		ctx.Header("Access-Control-Allow-Origin", "*")
-		return ctx
-	})
-
 	app.Use(infoLogger)
 }
 
@@ -52,7 +51,9 @@ func main() {
 
 	api.Routes(app)
 
-	err := app.Run(iris.Addr(settings.GetSettings().Listen), iris.WithCharset("UTF-8"), iris.WithoutServerError(iris.ErrServerClosed))
+	err := app.Run(iris.Addr(settings.GetSettings().Listen), iris.WithCharset("UTF-8"), iris.WithoutServerError(iris.ErrServerClosed), iris.WithRemoteAddrHeader("X-Real-Ip"))
+	// err := app.Run(iris.Addr(settings.GetSettings().Listen), iris.WithCharset("UTF-8"), iris.WithoutServerError(iris.ErrServerClosed), iris.WithRemoteAddrHeader("X-Forwarded-For"))
+	// err := app.Run(iris.Addr(settings.GetSettings().Listen), iris.WithCharset("UTF-8"), iris.WithoutServerError(iris.ErrServerClosed), iris.WithRemoteAddrHeader("CF-Connecting-IP"))
 	if err != nil {
 		app.Logger().Error("Exiting the server, with error:", err.Error())
 		return
