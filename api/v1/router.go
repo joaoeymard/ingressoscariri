@@ -4,7 +4,7 @@ import (
 	ctrlAuth "github.com/JoaoEymard/ingressoscariri/api/v1/controllers/auth"
 	ctrlEventos "github.com/JoaoEymard/ingressoscariri/api/v1/controllers/eventos"
 	ctrlMapa "github.com/JoaoEymard/ingressoscariri/api/v1/controllers/mapa"
-	// ctrlMiddleware "github.com/JoaoEymard/ingressoscariri/api/v1/middleware"
+	ctrlMiddleware "github.com/JoaoEymard/ingressoscariri/api/v1/middleware"
 	"github.com/kataras/iris/context"
 	"github.com/kataras/iris/core/router"
 )
@@ -22,9 +22,9 @@ func ConfigRoutes(route router.Party) {
 	route.Get("/map", ctrlAuth.Check, ctrlMapa.Find)
 
 	//Eventos
-	route.Post("/eventos", ctrlEventos.Insert)
-	route.Get("/eventos/", ctrlEventos.FindAll)
-	route.Get("/evento/{link:string regexp(^[a-zA-Z0-9_]+?)}", ctrlEventos.FindByID)
+	// route.Post("/eventos", ctrlMiddleware.Cors, ctrlEventos.Insert)
+	route.Get("/eventos/", ctrlMiddleware.Cors, ctrlEventos.FindAll)
+	route.Get("/evento/{link:string regexp(^[a-zA-Z0-9_]+?)}", ctrlMiddleware.Cors, ctrlEventos.FindByID)
 	// route.Get("/eventos/simples")
 	// route.Get("/eventos/{id:int}")
 

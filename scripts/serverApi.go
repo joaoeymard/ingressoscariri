@@ -21,12 +21,6 @@ var (
 func init() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	// iris.WithConfiguration(iris.Configuration{RemoteAddrHeaders: map[string]bool{
-	// 	"X-Real-Ip":        false,
-	// 	"X-Forwarded-For":  false,
-	// 	"CF-Connecting-IP": false,
-	// }})
-
 	app = iris.New()
 
 	if err := postgres.Open(); err != nil {
@@ -51,9 +45,7 @@ func main() {
 
 	api.Routes(app)
 
-	err := app.Run(iris.Addr(settings.GetSettings().Listen), iris.WithCharset("UTF-8"), iris.WithoutServerError(iris.ErrServerClosed), iris.WithRemoteAddrHeader("X-Real-Ip"))
-	// err := app.Run(iris.Addr(settings.GetSettings().Listen), iris.WithCharset("UTF-8"), iris.WithoutServerError(iris.ErrServerClosed), iris.WithRemoteAddrHeader("X-Forwarded-For"))
-	// err := app.Run(iris.Addr(settings.GetSettings().Listen), iris.WithCharset("UTF-8"), iris.WithoutServerError(iris.ErrServerClosed), iris.WithRemoteAddrHeader("CF-Connecting-IP"))
+	err := app.Run(iris.Addr(settings.GetSettings().Listen), iris.WithCharset("UTF-8"), iris.WithoutServerError(iris.ErrServerClosed))
 	if err != nil {
 		app.Logger().Error("Exiting the server, with error:", err.Error())
 		return
