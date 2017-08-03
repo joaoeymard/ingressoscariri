@@ -15,6 +15,8 @@ import (
 func Cors(ctx context.Context) {
 
 	ctx.Header("Access-Control-Allow-Origin", "*")
+	ctx.Header("Access-Control-Allow-Headers", "Content-Type, X-Requested-With")
+	ctx.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 
 	ctx.Next()
 }

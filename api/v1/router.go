@@ -1,40 +1,23 @@
 package v1
 
 import (
-	ctrlAuth "github.com/JoaoEymard/ingressoscariri/api/v1/controllers/auth"
-	ctrlEventos "github.com/JoaoEymard/ingressoscariri/api/v1/controllers/eventos"
-	ctrlMapa "github.com/JoaoEymard/ingressoscariri/api/v1/controllers/mapa"
-	ctrlMiddleware "github.com/JoaoEymard/ingressoscariri/api/v1/middleware"
-	"github.com/kataras/iris/context"
-	"github.com/kataras/iris/core/router"
+	ctrlEvento "github.com/JoaoEymard/ingressoscariri/api/v1/controllers/evento"
+	ctrlUser "github.com/JoaoEymard/ingressoscariri/api/v1/controllers/usuario"
+	"github.com/gorilla/mux"
 )
 
 // ConfigRoutes Tratamento das Rotas publicas
-func ConfigRoutes(route router.Party) {
+func ConfigRoutes(route *mux.Router) {
 
-	//Login
-	route.Get("/login/{user:string}/{passw:string}", ctrlAuth.Login)
+	// Eventos
+	route.HandleFunc("/evento", ctrlEvento.FindAll).Methods("GET")
+	route.HandleFunc("/evento/{link:[a-zA-Z0-9_]+?}", ctrlEvento.FindByID).Methods("GET")
 
-	//Logoff
-	route.Get("/logout", ctrlAuth.Logout)
-
-	// Mapa
-	route.Get("/map", ctrlAuth.Check, ctrlMapa.Find)
-
-	//Eventos
-	// route.Post("/eventos", ctrlMiddleware.Cors, ctrlEventos.Insert)
-	route.Get("/eventos/", ctrlMiddleware.Cors, ctrlEventos.FindAll)
-	route.Get("/evento/{link:string regexp(^[a-zA-Z0-9_]+?)}", ctrlMiddleware.Cors, ctrlEventos.FindByID)
-	// route.Get("/eventos/simples")
-	// route.Get("/eventos/{id:int}")
-
-	route.Get("/", func(ctx context.Context) {
-		ctx.JSON(map[string]string{"api": "testeAPI"})
-	})
-
-	// CEP
-	//route.Get("/cep/{cep:"+utils.Regex["integer"]+"}", ctrlCep.Find)
-
-	//route.Get("/cidades", ctrlCidades.FindAll)
+	// Usuarios
+	route.HandleFunc("/usuario", ctrlUser.Insert).Methods("POST")
+	route.HandleFunc("/usuario", ctrlUser.FindAll).Methods("GET")
+	route.HandleFunc("/usuario/{id}", ctrlUser.FindByID).Methods("GET")
+	route.HandleFunc("/usuario/{id:[0-9]}", ctrlUser.Update).Methods("PUT")
+	route.HandleFunc("/usuario/{id:[0-9]}", ctrlUser.Delete).Methods("DELETE")
 
 }

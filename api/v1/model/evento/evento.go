@@ -1,11 +1,11 @@
-package eventos
+package evento
 
 import (
+	"encoding/json"
 	"errors"
-	"strings"
+	"net/http"
 
 	"github.com/JoaoEymard/ingressoscariri/api/utils/database/postgres"
-	"github.com/kataras/iris"
 )
 
 // Insert Retorna os eventos via json
@@ -23,15 +23,15 @@ func Insert() ([]map[string]interface{}, int, error) {
 
 	_, err := postgres.Insert(attributes, table, values)
 	if err != nil {
-		return nil, iris.StatusBadRequest, err
+		return nil, http.StatusBadRequest, err
 	}
 
-	return nil, iris.StatusOK, nil
+	return nil, http.StatusOK, nil
 
 }
 
 // FindAll Retorna os eventos via json
-func FindAll() ([]map[string]interface{}, int, error) {
+func FindAll() ([]byte, int, error) {
 
 	var (
 		eventos     []map[string]interface{}
@@ -40,8 +40,8 @@ func FindAll() ([]map[string]interface{}, int, error) {
 	)
 
 	attributes := []string{
-		"evento.id AS id_evento", "evento.titulo", "evento.imagem", "evento.cidade", "evento.uf", "evento.localidade", "evento.link",
-		"periodo.id AS id_periodo", "periodo.data_periodo",
+		"DISTINCT ON (evento.id) evento.id AS id_evento", "evento.titulo", "evento.imagem", "evento.cidade", "evento.uf", "evento.localidade", "evento.link",
+		"periodo.id", "periodo.data_periodo",
 	}
 
 	table := "t_ingressoscariri_evento AS evento"
@@ -50,16 +50,18 @@ func FindAll() ([]map[string]interface{}, int, error) {
 		"LEFT JOIN t_ingressoscariri_evento_periodo AS periodo ON evento.id = periodo.id_evento",
 	}
 
+	where := []string{
+		"periodo.data_periodo >= NOW()",
+	}
+
 	order := []string{
-		"evento.id ASC, periodo.data_periodo ASC",
+		"evento.id ASC", ",", "periodo.data_periodo ASC",
 	}
 
-	rows, err := postgres.Select(attributes, table, join, nil, order, "")
+	rows, err := postgres.Select(attributes, table, join, where, order, "")
 	if err != nil {
-		return nil, iris.StatusBadRequest, errors.New("Bad Request: " + err.Error())
+		return nil, http.StatusBadRequest, errors.New("Bad Request: " + err.Error())
 	}
-
-	var oldEvento string
 
 	for rows.Next() {
 		var (
@@ -70,25 +72,22 @@ func FindAll() ([]map[string]interface{}, int, error) {
 
 		rows.Scan(&idEvento, &titulo, &imagem, &cidade, &uf, &localidade, &link, &idPeriodo, &dataPeriodo)
 
-		if eventos == nil || !strings.EqualFold(oldEvento, idEvento) {
-			oldEvento = idEvento
-			eventos = append(eventos, map[string]interface{}{
-				"id":         idEvento,
-				"titulo":     titulo,
-				"imagem":     imagem,
-				"cidade":     cidade,
-				"uf":         uf,
-				"localidade": localidade,
-				"link":       link,
-			})
+		eventos = append(eventos, map[string]interface{}{
+			"id":         idEvento,
+			"titulo":     titulo,
+			"imagem":     imagem,
+			"cidade":     cidade,
+			"uf":         uf,
+			"localidade": localidade,
+			"link":       link,
+		})
 
-			if idPeriodo != "" {
-				periodos = append(periodos, map[string]interface{}{
-					"idEvento":     idEvento,
-					"id":           idPeriodo,
-					"data_periodo": dataPeriodo,
-				})
-			}
+		if idPeriodo != "" {
+			periodos = append(periodos, map[string]interface{}{
+				"idEvento":     idEvento,
+				"id":           idPeriodo,
+				"data_periodo": dataPeriodo,
+			})
 		}
 
 	}
@@ -118,15 +117,20 @@ func FindAll() ([]map[string]interface{}, int, error) {
 	}
 
 	if jsonEventos == nil {
-		return nil, iris.StatusNotFound, errors.New("Not Found: Id não encontrado")
+		return nil, http.StatusNotFound, errors.New("Not Found: Id não encontrado")
 	}
 
-	return jsonEventos, iris.StatusOK, nil
+	byteEvento, err := json.Marshal(jsonEventos)
+	if err != nil {
+		return nil, http.StatusBadRequest, errors.New("Not Found: Id não encontrado")
+	}
+
+	return byteEvento, http.StatusOK, nil
 
 }
 
 // FindByID Retorna o evento correspondente ao id via json
-func FindByID(link string) (map[string]interface{}, int, error) {
+func FindByID(link string) ([]byte, int, error) {
 
 	var (
 		eventos    = make(map[string]interface{})
@@ -139,8 +143,8 @@ func FindByID(link string) (map[string]interface{}, int, error) {
 	attributes := []string{
 		"evento.id AS id_evento", "evento.titulo", "evento.imagem", "evento.cidade", "evento.uf", "evento.localidade", "evento.taxa", "evento.mapa", "evento.descricao", "evento.link",
 		"periodo.id AS id_periodo", "periodo.data_periodo", "periodo.atracao",
-		"categoria.id AS id_categoria", "categoria.nome", "categoria.valor", "categoria.quantidade", "categoria.quantidade_vendida", "categoria.lote",
-		"galeria.id AS id_galeria", "galeria.imagem",
+		"categoria.id", "categoria.nome", "categoria.valor", "categoria.quantidade", "categoria.quantidade_vendida", "categoria.lote",
+		"galeria.id", "galeria.imagem",
 	}
 
 	table := "t_ingressoscariri_evento AS evento"
@@ -161,7 +165,7 @@ func FindByID(link string) (map[string]interface{}, int, error) {
 
 	rows, err := postgres.Select(attributes, table, join, where, order, "")
 	if err != nil {
-		return nil, iris.StatusBadRequest, errors.New("Bad Request: " + err.Error())
+		return nil, http.StatusBadRequest, errors.New("Bad Request: " + err.Error())
 	}
 
 	for rows.Next() {
@@ -173,7 +177,7 @@ func FindByID(link string) (map[string]interface{}, int, error) {
 			imagemGaleria                                                       interface{}
 		)
 
-		rows.Scan(&idEvento, &titulo, &imagem, &cidade, &uf, &localidade, &taxa, &mapa, &descricao, &link, &idPeriodo, &dataPeriodo, &atracao, &lote, &idCategoria, &nomeCategoria, &valor, &quantidade, &quantidadeVendida, &idGaleria, &imagemGaleria)
+		rows.Scan(&idEvento, &titulo, &imagem, &cidade, &uf, &localidade, &taxa, &mapa, &descricao, &link, &idPeriodo, &dataPeriodo, &atracao, &idCategoria, &nomeCategoria, &valor, &quantidade, &quantidadeVendida, &lote, &idGaleria, &imagemGaleria)
 
 		eventos[idEvento] = map[string]interface{}{
 			"id":         idEvento,
@@ -278,9 +282,14 @@ func FindByID(link string) (map[string]interface{}, int, error) {
 	jsonEvento = eventoAux
 
 	if jsonEvento == nil {
-		return nil, iris.StatusNotFound, errors.New("Not Found: Id não encontrado")
+		return nil, http.StatusNotFound, errors.New("Not Found: Id não encontrado")
 	}
 
-	return jsonEvento, iris.StatusOK, nil
+	byteEvento, err := json.Marshal(jsonEvento)
+	if err != nil {
+		return nil, http.StatusBadRequest, errors.New("Not Found: Id não encontrado")
+	}
+
+	return byteEvento, http.StatusOK, nil
 
 }

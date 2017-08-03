@@ -2,10 +2,11 @@ package settings
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"strconv"
+
+	"github.com/JoaoEymard/ingressoscariri/api/utils/logger"
 )
 
 type Settings struct {
@@ -38,9 +39,9 @@ func init() {
 	env = os.Getenv("GO_UTILS")
 	if env == "" {
 		if GoDetails, _ := strconv.ParseBool(os.Getenv("GO_DETAILS")); GoDetails {
-			fmt.Println("[Warning] Setting development environment due to lack of GO_UTILS value")
+			logger.Warnln("Setting development environment due to lack of GO_UTILS value")
 		} else {
-			fmt.Println("[Warning] GO_UTILS")
+			logger.Warnln("GO_UTILS")
 		}
 		env = "development"
 	}
@@ -52,18 +53,18 @@ func loadSettingsByEnv(env string) {
 	content, err := ioutil.ReadFile(environments[env])
 	if err != nil {
 		if GoDetails, _ := strconv.ParseBool(os.Getenv("GO_DETAILS")); GoDetails {
-			fmt.Println("[Error] While reading config file", err)
+			logger.Fatalf("While reading config file %v", err)
 		} else {
-			fmt.Println("[Error] ReadFile environments[env]")
+			logger.Fatalln("ReadFile environments[env]")
 		}
 	}
 	settings = Settings{}
 	jsonErr := json.Unmarshal(content, &settings)
 	if jsonErr != nil {
 		if GoDetails, _ := strconv.ParseBool(os.Getenv("GO_DETAILS")); GoDetails {
-			fmt.Println("[Error] While parsing config file", jsonErr)
+			logger.Fatalf("While parsing config file %v", jsonErr)
 		} else {
-			fmt.Println("[Error] Unmarshal settings")
+			logger.Fatalln("Unmarshal settings")
 		}
 	}
 }
