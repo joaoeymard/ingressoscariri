@@ -21,8 +21,6 @@ func FindAll(res http.ResponseWriter, req *http.Request) {
 
 	begin := time.Now().UTC()
 
-	res.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
-
 	jsonEventos, statusCode, err := usuario.FindAll()
 
 	res.WriteHeader(statusCode)
@@ -40,8 +38,6 @@ func FindAll(res http.ResponseWriter, req *http.Request) {
 func FindByID(res http.ResponseWriter, req *http.Request) {
 
 	begin := time.Now().UTC()
-
-	res.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
 
 	jsonEvento, statusCode, err := usuario.FindByID(mux.Vars(req)["link"])
 

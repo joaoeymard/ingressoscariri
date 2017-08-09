@@ -11,15 +11,11 @@ import (
 // Insert Retorna os eventos via json
 func Insert() ([]map[string]interface{}, int, error) {
 
-	attributes := []string{
-		"titulo", "imagem", "cidade", "uf", "localidade", "taxa", "mapa", "descricao",
-	}
+	attributes := "titulo, imagem, cidade, uf, localidade, taxa, mapa, descricao"
 
 	table := "t_ingressoscariri_evento"
 
-	values := [][]interface{}{
-		[]interface{}{"titulo1", "hash(imagem1)", "cidade1", "u1", "localidade1", 19.0, "mapa1", "descricao1"},
-	}
+	values := []interface{}{"titulo1", "hash(imagem1)", "cidade1", "u1", "localidade1", 19.0, "mapa1", "descricao1"}
 
 	_, err := postgres.Insert(attributes, table, values)
 	if err != nil {
@@ -39,24 +35,16 @@ func FindAll() ([]byte, int, error) {
 		jsonEventos []map[string]interface{}
 	)
 
-	attributes := []string{
-		"DISTINCT ON (evento.id) evento.id AS id_evento", "evento.titulo", "evento.imagem", "evento.cidade", "evento.uf", "evento.localidade", "evento.link",
-		"periodo.id", "periodo.data_periodo",
-	}
+	attributes := `DISTINCT ON (evento.id) evento.id AS id_evento, evento.titulo, evento.imagem, evento.cidade, evento.uf, evento.localidade, evento.link,
+				   periodo.id, periodo.data_periodo`
 
 	table := "t_ingressoscariri_evento AS evento"
 
-	join := []string{
-		"LEFT JOIN t_ingressoscariri_evento_periodo AS periodo ON evento.id = periodo.id_evento",
-	}
+	join := "LEFT JOIN t_ingressoscariri_evento_periodo AS periodo ON evento.id = periodo.id_evento"
 
-	where := []string{
-		"periodo.data_periodo >= NOW()",
-	}
+	where := "periodo.data_periodo >= NOW()"
 
-	order := []string{
-		"evento.id ASC", ",", "periodo.data_periodo ASC",
-	}
+	order := "evento.id ASC, periodo.data_periodo ASC"
 
 	rows, err := postgres.Select(attributes, table, join, where, order, "")
 	if err != nil {
@@ -65,28 +53,29 @@ func FindAll() ([]byte, int, error) {
 
 	for rows.Next() {
 		var (
-			idEvento, idPeriodo                          string
-			titulo, imagem, cidade, uf, localidade, link interface{}
-			dataPeriodo                                  interface{}
+			idEvento                                                                         string
+			eventoTitulo, eventoImagem, eventoCidade, eventoUf, eventoLocalidade, eventoLink interface{}
+			idPeriodo                                                                        string
+			periodoDataPeriodo                                                               interface{}
 		)
 
-		rows.Scan(&idEvento, &titulo, &imagem, &cidade, &uf, &localidade, &link, &idPeriodo, &dataPeriodo)
+		rows.Scan(&idEvento, &eventoTitulo, &eventoImagem, &eventoCidade, &eventoUf, &eventoLocalidade, &eventoLink, &idPeriodo, &periodoDataPeriodo)
 
 		eventos = append(eventos, map[string]interface{}{
 			"id":         idEvento,
-			"titulo":     titulo,
-			"imagem":     imagem,
-			"cidade":     cidade,
-			"uf":         uf,
-			"localidade": localidade,
-			"link":       link,
+			"titulo":     eventoTitulo,
+			"imagem":     eventoImagem,
+			"cidade":     eventoCidade,
+			"uf":         eventoUf,
+			"localidade": eventoLocalidade,
+			"link":       eventoLink,
 		})
 
 		if idPeriodo != "" {
 			periodos = append(periodos, map[string]interface{}{
 				"idEvento":     idEvento,
 				"id":           idPeriodo,
-				"data_periodo": dataPeriodo,
+				"data_periodo": periodoDataPeriodo,
 			})
 		}
 
@@ -140,28 +129,20 @@ func FindByID(link string) ([]byte, int, error) {
 		jsonEvento map[string]interface{}
 	)
 
-	attributes := []string{
-		"evento.id AS id_evento", "evento.titulo", "evento.imagem", "evento.cidade", "evento.uf", "evento.localidade", "evento.taxa", "evento.mapa", "evento.descricao", "evento.link",
-		"periodo.id AS id_periodo", "periodo.data_periodo", "periodo.atracao",
-		"categoria.id", "categoria.nome", "categoria.valor", "categoria.quantidade", "categoria.quantidade_vendida", "categoria.lote",
-		"galeria.id", "galeria.imagem",
-	}
+	attributes := `evento.id AS id_evento, evento.titulo, evento.imagem, evento.cidade, evento.uf, evento.localidade, evento.taxa, evento.mapa, evento.descricao, evento.link,
+				   periodo.id AS id_periodo, periodo.data_periodo, periodo.atracao,
+				   categoria.id, categoria.nome, categoria.valor, categoria.quantidade, categoria.quantidade_vendida, categoria.lote,
+				   galeria.id, galeria.imagem`
 
 	table := "t_ingressoscariri_evento AS evento"
 
-	join := []string{
-		"LEFT JOIN t_ingressoscariri_evento_periodo AS periodo ON evento.id = periodo.id_evento",
-		"LEFT JOIN t_ingressoscariri_evento_categoria AS categoria ON periodo.id = categoria.id_periodo",
-		"LEFT JOIN t_ingressoscariri_evento_galeria AS galeria ON evento.id = galeria.id_evento",
-	}
+	join := `LEFT JOIN t_ingressoscariri_evento_periodo AS periodo ON evento.id = periodo.id_evento
+		 	 LEFT JOIN t_ingressoscariri_periodo_categoria AS categoria ON periodo.id = categoria.id_periodo
+		 	 LEFT JOIN t_ingressoscariri_evento_galeria AS galeria ON evento.id = galeria.id_evento`
 
-	where := []string{
-		"evento.link LIKE '" + link + "'",
-	}
+	where := "evento.link LIKE '" + link + "'"
 
-	order := []string{
-		"periodo.data_periodo ASC",
-	}
+	order := "periodo.data_periodo ASC"
 
 	rows, err := postgres.Select(attributes, table, join, where, order, "")
 	if err != nil {
@@ -170,34 +151,37 @@ func FindByID(link string) ([]byte, int, error) {
 
 	for rows.Next() {
 		var (
-			idEvento, idPeriodo, idCategoria, idGaleria                         string
-			titulo, imagem, cidade, uf, localidade, taxa, mapa, descricao, link interface{}
-			dataPeriodo, atracao, lote                                          interface{}
-			nomeCategoria, valor, quantidade, quantidadeVendida                 interface{}
-			imagemGaleria                                                       interface{}
+			idEvento                                                                                                                  string
+			eventoTitulo, eventoImagem, eventoCidade, eventoUf, eventoLocalidade, eventoTaxa, eventoMapa, eventoDescricao, eventoLink interface{}
+			idPeriodo                                                                                                                 string
+			periodoDataPeriodo, periodoAtracao                                                                                        interface{}
+			idCategoria                                                                                                               string
+			categoriaNome, categoriaValor, categoriaQuantidade, categoriaQuantidadeVendida, categoriaLote                             interface{}
+			idGaleria                                                                                                                 string
+			galeriaImagem                                                                                                             interface{}
 		)
 
-		rows.Scan(&idEvento, &titulo, &imagem, &cidade, &uf, &localidade, &taxa, &mapa, &descricao, &link, &idPeriodo, &dataPeriodo, &atracao, &idCategoria, &nomeCategoria, &valor, &quantidade, &quantidadeVendida, &lote, &idGaleria, &imagemGaleria)
+		rows.Scan(&idEvento, &eventoTitulo, &eventoImagem, &eventoCidade, &eventoUf, &eventoLocalidade, &eventoTaxa, &eventoMapa, &eventoDescricao, &eventoLink, &idPeriodo, &periodoDataPeriodo, &periodoAtracao, &idCategoria, &categoriaNome, &categoriaValor, &categoriaQuantidade, &categoriaQuantidadeVendida, &categoriaLote, &idGaleria, &galeriaImagem)
 
 		eventos[idEvento] = map[string]interface{}{
 			"id":         idEvento,
-			"titulo":     titulo,
-			"imagem":     imagem,
-			"cidade":     cidade,
-			"uf":         uf,
-			"localidade": localidade,
-			"taxa":       taxa,
-			"mapa":       mapa,
-			"descricao":  descricao,
-			"link":       link,
+			"titulo":     eventoTitulo,
+			"imagem":     eventoImagem,
+			"cidade":     eventoCidade,
+			"uf":         eventoUf,
+			"localidade": eventoLocalidade,
+			"taxa":       eventoTaxa,
+			"mapa":       eventoMapa,
+			"descricao":  eventoDescricao,
+			"link":       eventoLink,
 		}
 
 		if idPeriodo != "" {
 			periodos[idPeriodo] = map[string]interface{}{
 				"idEvento":     idEvento,
 				"id":           idPeriodo,
-				"data_periodo": dataPeriodo,
-				"atracao":      atracao,
+				"data_periodo": periodoDataPeriodo,
+				"atracao":      periodoAtracao,
 			}
 		}
 
@@ -205,11 +189,11 @@ func FindByID(link string) ([]byte, int, error) {
 			categorias[idCategoria] = map[string]interface{}{
 				"idPeriodo":          idPeriodo,
 				"id":                 idCategoria,
-				"nome":               nomeCategoria,
-				"valor":              valor,
-				"quantidade":         quantidade,
-				"quantidade_vendida": quantidadeVendida,
-				"lote":               lote,
+				"nome":               categoriaNome,
+				"valor":              categoriaValor,
+				"quantidade":         categoriaQuantidade,
+				"quantidade_vendida": categoriaQuantidadeVendida,
+				"lote":               categoriaLote,
 			}
 		}
 
@@ -217,7 +201,7 @@ func FindByID(link string) ([]byte, int, error) {
 			galerias[idGaleria] = map[string]interface{}{
 				"idEvento": idEvento,
 				"id":       idGaleria,
-				"imagem":   imagemGaleria,
+				"imagem":   galeriaImagem,
 			}
 		}
 
