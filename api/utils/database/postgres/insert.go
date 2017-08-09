@@ -8,11 +8,12 @@ import (
 
 	"fmt"
 
+	// _ Importanto apenas o init
 	_ "github.com/lib/pq"
 )
 
 // Insert Insert Universal para o Banco Postgres
-func Insert(attributes []string, table string, values [][]interface{}) (*sql.Rows, error) {
+func Insert(attributes, table string, values []interface{}) (*sql.Rows, error) {
 	var query []string
 
 	query = []string{"INSERT INTO"}
@@ -23,9 +24,9 @@ func Insert(attributes []string, table string, values [][]interface{}) (*sql.Row
 		return nil, errors.New("Parametro - 'Tabela' está vazio")
 	}
 
-	if attributes != nil {
+	if attributes != "" {
 		query = append(query, "(")
-		query = append(query, strings.Join(attributes, ","))
+		query = append(query, attributes)
 		query = append(query, ")")
 	} else {
 		return nil, errors.New("Parametro - 'Atributos' está vazio")
@@ -33,23 +34,16 @@ func Insert(attributes []string, table string, values [][]interface{}) (*sql.Row
 
 	query = append(query, "VALUES")
 
-	var valuesAux []interface{}
 	if values != nil {
-		for y, value := range values {
-			query = append(query, "(")
-			for x, v := range value {
-				valuesAux = append(valuesAux, v)
-				if x+1 != len(value) {
-					query = append(query, fmt.Sprintf("$%d,", len(valuesAux)))
-				} else {
-					query = append(query, fmt.Sprintf("$%d", len(valuesAux)))
-				}
-			}
-			query = append(query, ")")
+		query = append(query, "(")
+		for y := range values {
 			if y+1 != len(values) {
-				query = append(query, ",")
+				query = append(query, fmt.Sprintf("$%d,", y))
+			} else {
+				query = append(query, fmt.Sprintf("$%d", y))
 			}
 		}
+		query = append(query, ")")
 	} else {
 		return nil, errors.New("Parametro - 'Values' está vazio")
 	}
@@ -61,5 +55,5 @@ func Insert(attributes []string, table string, values [][]interface{}) (*sql.Row
 		return nil, err
 	}
 
-	return stmt.Query(valuesAux...)
+	return stmt.Query(values...)
 }

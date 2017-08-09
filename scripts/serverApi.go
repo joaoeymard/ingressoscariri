@@ -1,55 +1,72 @@
 package main
 
 import (
-	"fmt"
+	"net/http"
 	"os"
 	"runtime"
 	"strconv"
+	"time"
+
+	"github.com/gorilla/handlers"
 
 	"github.com/JoaoEymard/ingressoscariri/api"
 	"github.com/JoaoEymard/ingressoscariri/api/utils/database/postgres"
+	"github.com/JoaoEymard/ingressoscariri/api/utils/logger"
 	"github.com/JoaoEymard/ingressoscariri/api/utils/settings"
-
-	"github.com/kataras/iris"
-	"github.com/kataras/iris/middleware/logger"
+	"github.com/gorilla/mux"
+	//sql "github.com/JoaoEymard/ingressoscariri/service/core/database"
 )
 
 var (
-	app *iris.Application
+	app *mux.Router
+	srv *http.Server
 )
 
 func init() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	app = iris.New()
-
 	if err := postgres.Open(); err != nil {
 		if GoDetails, _ := strconv.ParseBool(os.Getenv("GO_DETAILS")); GoDetails {
-			fmt.Println("[Erro] Conexão Postgres", err.Error())
+			logger.Errorf("Conexão Postgres %v", err.Error())
 		} else {
-			fmt.Println("[Erro] Open Postgres")
+			logger.Errorln("Open Postgres")
 		}
 	}
 
-	infoLogger := logger.New(logger.Config{
-		Status: true,
-		IP:     true,
-		Method: true,
-		Path:   true,
+	app = mux.NewRouter()
+
+	srv = &http.Server{
+		Handler:      app,
+		Addr:         settings.GetSettings().Listen,
+		ReadTimeout:  2 * time.Minute,
+		WriteTimeout: 2 * time.Minute,
+	}
+
+	allowedOrigins := handlers.AllowedOrigins([]string{
+		"http://localhost:3000",
+		"http://192.168.0.2:3000",
 	})
 
-	app.Use(infoLogger)
+	allowedMethods := handlers.AllowedMethods([]string{
+		"POST",
+		"GET",
+		"PUT",
+		"DELETE",
+		"OPTIONS",
+	})
+
+	srv.Handler = handlers.CORS(allowedOrigins, allowedMethods)(app)
+
 }
 
 func main() {
 
 	api.Routes(app)
 
-	err := app.Run(iris.Addr(settings.GetSettings().Listen), iris.WithCharset("UTF-8"), iris.WithoutServerError(iris.ErrServerClosed))
-	if err != nil {
-		app.Logger().Error("Exiting the server, with error:", err.Error())
-		return
-	}
-	app.Logger().Info("Exiting the server...")
+	logger.Infof("Inciando a aplicação, acesse: %v", "http://"+settings.GetSettings().Listen)
 
+	err := srv.ListenAndServe()
+	if err != nil {
+		logger.Errorln("Fechando aplicação com erro:", err.Error())
+	}
 }

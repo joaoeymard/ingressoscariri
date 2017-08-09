@@ -6,18 +6,19 @@ import (
 
 	"strings"
 
+	// _ Importanto apenas o init
 	_ "github.com/lib/pq"
 )
 
 // Select Select Universal para o Banco Postgres
-func Select(attributes []string, table string, join, where, order []string, limit string) (*sql.Rows, error) {
+func Select(attributes, table, join, where, order, limit string) (*sql.Rows, error) {
 
 	var query []string
 
 	query = []string{"SELECT"}
 
-	if attributes != nil {
-		query = append(query, strings.Join(attributes, ","))
+	if attributes != "" {
+		query = append(query, attributes)
 	} else {
 		query = append(query, "*")
 	}
@@ -30,18 +31,18 @@ func Select(attributes []string, table string, join, where, order []string, limi
 		return nil, errors.New("Parametro - 'Tabela' está vazio")
 	}
 
-	if join != nil {
-		query = append(query, strings.Join(join, " "))
+	if join != "" {
+		query = append(query, join)
 	}
 
-	if where != nil {
+	if where != "" {
 		query = append(query, "WHERE")
-		query = append(query, strings.Join(where, " "))
+		query = append(query, where)
 	}
 
-	if order != nil {
+	if order != "" {
 		query = append(query, "ORDER BY")
-		query = append(query, strings.Join(order, " "))
+		query = append(query, order)
 	}
 
 	if limit != "" {

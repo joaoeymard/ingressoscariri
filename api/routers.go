@@ -2,16 +2,16 @@ package api
 
 import (
 	"github.com/JoaoEymard/ingressoscariri/api/v1"
-	"github.com/kataras/iris"
+	"github.com/gorilla/mux"
 )
 
 // Routes pacotes das rotas
-func Routes(app *iris.Application) {
+func Routes(app *mux.Router) {
 
-	apiParty := app.Party("/api/")
+	apiParty := app.PathPrefix("/api").Subrouter()
 	{
 
-		v1Party := apiParty.Party("v1")
+		v1Party := apiParty.PathPrefix("/v1").Subrouter()
 		{
 			v1.ConfigRoutes(v1Party)
 		}
