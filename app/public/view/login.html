@@ -1,0 +1,26 @@
+<navbar></navbar>
+
+<section class="container">
+  <div class="row">
+    <div class="col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
+      <div class="panel panel-default" style="margin: 20px 0 0">
+        <div class="panel-body">
+          <h2 class="text-center" style="margin: 0 0 20px">Acessar conta</h2>
+
+          <alert alert="alert" ng-repeat="alert in alerts"></alert>
+          <form name="formAcesso" novalidate ng-submit="logar()">
+            <span ng-show="formAcesso.cpf.$error.required && formAcesso.cpf.$dirty" class="pull-right text-danger">Campo obrigatório</span>
+            <span ng-show="formAcesso.cpf.$error.pattern && formAcesso.cpf.$dirty" class="pull-right text-danger">Somente números</span>
+            <input type="text" name="cpf" ng-model="usuario.cpf" class="form-group form-control input-lg" placeholder="CPF" maxlength="11" required autofocus autocomplete="off" pattern="^[0-9]+?">
+            <span ng-show="formAcesso.senha.$error.required && formAcesso.senha.$dirty" class="pull-right text-danger">Campo obrigatório</span>
+            <input type="password" name="senha" ng-model="usuario.senha" class="form-group form-control input-lg" placeholder="Senha" required autocomplete="off">
+            <a href="#" class="btn text-danger">Esqueci a senha?</a>
+            <input type="submit" name="" value="Acessar conta" class="btn btn-cor4 pull-right" ng-disabled="formAcesso.$invalid">
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<btn-ajuda></btn-ajuda>

@@ -17,6 +17,11 @@ angular.module("ingressosCariri").config(function ($routeProvider, $httpProvider
     templateUrl: "view/ajuda.html"
   })
 
+  .when("/login", {
+    templateUrl: "view/login.html",
+    controller: "loginCtrl"
+  })
+
   .when("/erro", {
     templateUrl: "view/erro.html"
   })

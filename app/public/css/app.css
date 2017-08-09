@@ -53,6 +53,19 @@ html, body {
   font-weight: 100;
   letter-spacing: 1.5px;
 }
+.text-box-wait{
+  position: relative;
+  margin-left: 10px;
+  top: -9px;
+  font-size: 18px;
+  letter-spacing: 1px;
+}
+.alert {
+  margin-bottom: 5px
+}
+input.ng-invalid.ng-dirty {
+    border-color: #a94442 !important
+}
 
 /* Fim dos estilos gerais */
 
