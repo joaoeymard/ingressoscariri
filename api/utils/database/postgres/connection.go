@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/JoaoEymard/ingressoscariri/api/utils/settings"
+	// _ Importanto apenas o init
 	_ "github.com/lib/pq"
 )
 
@@ -24,10 +25,10 @@ func Open() error {
 	criptPass := settings.GetSettings().Database.ConnectionRw.Pass
 	postgres, err = sql.Open("postgres", "host="+settings.GetSettings().Database.ConnectionRw.Host+" user="+settings.GetSettings().Database.ConnectionRw.User+" password="+string(criptPass[0:2])+string(criptPass[len(criptPass)-2:])+" dbname="+settings.GetSettings().Database.ConnectionRw.Database+" sslmode=disable")
 	mutex.Unlock()
-
 	if err != nil {
 		return err
 	}
+
 	if err := postgres.Ping(); err != nil {
 		return err
 	}

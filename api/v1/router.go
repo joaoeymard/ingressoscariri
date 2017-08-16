@@ -1,6 +1,7 @@
 package v1
 
 import (
+	ctrlAuth "github.com/JoaoEymard/ingressoscariri/api/v1/controllers/auth"
 	ctrlEvento "github.com/JoaoEymard/ingressoscariri/api/v1/controllers/evento"
 	ctrlUser "github.com/JoaoEymard/ingressoscariri/api/v1/controllers/usuario"
 	"github.com/gorilla/mux"
@@ -19,5 +20,8 @@ func ConfigRoutes(route *mux.Router) {
 	route.HandleFunc("/usuario/{id:[0-9]}", ctrlUser.FindByID).Methods("GET")
 	route.HandleFunc("/usuario/{id:[0-9]}", ctrlUser.Update).Methods("PUT")
 	route.HandleFunc("/usuario/{id:[0-9]}", ctrlUser.Delete).Methods("DELETE")
+
+	// Teste
+	route.HandleFunc("/withAuth", ctrlAuth.Check).Methods("GET")
 
 }

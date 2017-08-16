@@ -1,32 +1,35 @@
 package session
 
 import (
-	"time"
-
 	"github.com/JoaoEymard/ingressoscariri/api/utils/settings"
-	"github.com/gorilla/securecookie"
-	"github.com/kataras/iris/sessions"
+	"github.com/gorilla/sessions"
 )
 
 var (
-	cookieName   = settings.GetSettings().CookieName
-	hashKey      = []byte(settings.GetSettings().HashKey)
-	blockKey     = []byte(settings.GetSettings().BlockKey)
-	secureCookie = securecookie.New(hashKey, blockKey)
+	cookieName = []byte(settings.GetSettings().CookieName)
+	hashKey    = []byte(settings.GetSettings().HashKey)
+	blockKey   = []byte(settings.GetSettings().BlockKey)
 
-	session *sessions.Sessions
+	store *sessions.CookieStore
 )
 
 func init() {
-	session = sessions.New(sessions.Config{
-		Cookie:  cookieName,
-		Encode:  secureCookie.Encode,
-		Decode:  secureCookie.Decode,
-		Expires: 5 * time.Minute,
-	})
+
+	store = sessions.NewCookieStore(cookieName, hashKey, blockKey)
 }
 
-// GetSession Retorna a sessions
-func GetSession() *sessions.Sessions {
-	return session
+// SetSession Adiciona os valores para uma sessão
+func SetSession(domain, path string, maxAge int, httpOnly, secure bool) {
+	store.Options = &sessions.Options{
+		Domain:   "",
+		Path:     "/",
+		MaxAge:   5,
+		HttpOnly: true,
+		Secure:   true,
+	}
+}
+
+// GetSession Retorna a sessions criadas
+func GetSession() *sessions.CookieStore {
+	return store
 }

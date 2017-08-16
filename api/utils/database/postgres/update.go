@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	// _ Importanto apenas o init
 	_ "github.com/lib/pq"
 )
 
