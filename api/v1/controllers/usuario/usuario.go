@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gorilla/mux"
-
 	"github.com/JoaoEymard/ingressoscariri/api/utils/logger"
 	"github.com/JoaoEymard/ingressoscariri/api/v1/model/usuario"
 )
@@ -16,12 +14,12 @@ func Insert(res http.ResponseWriter, req *http.Request) {
 
 }
 
-// FindAll Retorna os eventos via json
-func FindAll(res http.ResponseWriter, req *http.Request) {
+// Find Retorna o(s) registro(s) via json
+func Find(res http.ResponseWriter, req *http.Request) {
 
 	begin := time.Now().UTC()
 
-	jsonEventos, statusCode, err := usuario.FindAll()
+	jsonEventos, statusCode, err := usuario.Find(req.URL.Query())
 
 	res.WriteHeader(statusCode)
 	if err != nil {
@@ -32,25 +30,6 @@ func FindAll(res http.ResponseWriter, req *http.Request) {
 	res.Write(jsonEventos)
 
 	logger.Infoln(logger.Status(fmt.Sprintf("%+v\n", res)), req.RemoteAddr, req.Method, req.URL, time.Now().UTC().Sub(begin))
-}
-
-// FindByID Retorna o evento correspondente ao id via json
-func FindByID(res http.ResponseWriter, req *http.Request) {
-
-	begin := time.Now().UTC()
-
-	jsonEvento, statusCode, err := usuario.FindByID(mux.Vars(req)["link"])
-
-	res.WriteHeader(statusCode)
-	if err != nil {
-		res.Write([]byte(err.Error()))
-		return
-	}
-
-	res.Write(jsonEvento)
-
-	logger.Infoln(logger.Status(fmt.Sprintf("%+v\n", res)), req.RemoteAddr, req.Method, req.URL, time.Now().UTC().Sub(begin))
-
 }
 
 // Update Responsavel por Atualizar um registro

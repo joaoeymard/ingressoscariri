@@ -5,14 +5,14 @@
 	"blockKey": "lot-secret-of-characters-big-too",
 	"database": {
 		"connectionRw": {
-			"host": "177.126.78.163 port=5432",
+			"host": "localhost port=5432",
 			"user": "postgres",
 			"pass": "ro5hAth5@a&rafot",
 			"database": "ingressoscariri",
 			"maxOpenConn": 10
 		},
 		"connectionRo": {
-			"host": "177.126.78.163 port=5432",
+			"host": "localhost port=5432",
 			"user": "postgres",
 			"pass": "ro5hAth5@a&rafot",
 			"database": "ingressoscariri",

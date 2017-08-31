@@ -16,8 +16,7 @@ func ConfigRoutes(route *mux.Router) {
 
 	// Usuarios
 	route.HandleFunc("/usuario", ctrlUser.Insert).Methods("POST")
-	route.HandleFunc("/usuario", ctrlUser.FindAll).Methods("GET")
-	route.HandleFunc("/usuario/{id:[0-9]}", ctrlUser.FindByID).Methods("GET")
+	route.HandleFunc("/usuario", ctrlUser.Find).Methods("GET")
 	route.HandleFunc("/usuario/{id:[0-9]}", ctrlUser.Update).Methods("PUT")
 	route.HandleFunc("/usuario/{id:[0-9]}", ctrlUser.Delete).Methods("DELETE")
 

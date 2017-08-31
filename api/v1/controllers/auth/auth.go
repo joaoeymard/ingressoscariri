@@ -1,12 +1,7 @@
 package auth
 
 import (
-	"fmt"
 	"net/http"
-	"time"
-
-	"github.com/JoaoEymard/ingressoscariri/api/utils/logger"
-	"github.com/JoaoEymard/ingressoscariri/api/utils/session"
 )
 
 func Check(res http.ResponseWriter, req *http.Request) {
@@ -17,19 +12,17 @@ func Check(res http.ResponseWriter, req *http.Request) {
 	// }
 	// ctx.StatusCode(iris.StatusForbidden)
 
-	begin := time.Now().UTC()
+	// begin := time.Now().UTC()
 
-	store, err := session.GetSession().Get(req, "teste")
-	if err != nil {
-		logger.Errorln(err)
-	}
-	logger.Debugln(store.ID)
+	// store, err := session.GetSession().Get(req, "teste")
+	// if err != nil {
+	// 	logger.Errorln(err)
+	// }
+	// logger.Debugln(store.ID)
 
-	res.Write([]byte("Teste"))
+	// res.Write([]byte("Teste"))
 
-	logger.Infoln(logger.Status(fmt.Sprintf("%+v\n", res)), req.RemoteAddr, req.Method, req.URL, time.Now().UTC().Sub(begin))
-
-	return
+	// logger.Infoln(logger.Status(fmt.Sprintf("%+v\n", res)), req.RemoteAddr, req.Method, req.URL, time.Now().UTC().Sub(begin))
 }
 
 func Login(res http.ResponseWriter, req *http.Request) {
