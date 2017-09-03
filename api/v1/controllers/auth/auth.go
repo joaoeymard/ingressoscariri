@@ -26,6 +26,7 @@ func Check(res http.ResponseWriter, req *http.Request) {
 }
 
 func Login(res http.ResponseWriter, req *http.Request) {
+
 	// if ctx.Params().Get("user") == "c019" && ctx.Params().Get("passw") == "admin" {
 	// 	sess := session.GetSession().Start(ctx)
 	// 	sess.Set("sessionCript", true)

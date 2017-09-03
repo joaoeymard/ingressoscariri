@@ -12,6 +12,21 @@ import (
 // Insert Responsavel por Inserir um registro
 func Insert(res http.ResponseWriter, req *http.Request) {
 
+	begin := time.Now().UTC()
+
+	jsonEventos, statusCode, err := usuario.Insert(req.Body)
+
+	res.WriteHeader(statusCode)
+	if err != nil {
+		res.Write([]byte(err.Error()))
+		logger.Warnln(logger.Status(fmt.Sprintf("%+v\n", res)), req.RemoteAddr, req.Method, req.URL, time.Now().UTC().Sub(begin))
+		return
+	}
+
+	res.Write(jsonEventos)
+
+	logger.Infoln(logger.Status(fmt.Sprintf("%+v\n", res)), req.RemoteAddr, req.Method, req.URL, time.Now().UTC().Sub(begin))
+
 }
 
 // Find Retorna o(s) registro(s) via json
@@ -24,6 +39,7 @@ func Find(res http.ResponseWriter, req *http.Request) {
 	res.WriteHeader(statusCode)
 	if err != nil {
 		res.Write([]byte(err.Error()))
+		logger.Warnln(logger.Status(fmt.Sprintf("%+v\n", res)), req.RemoteAddr, req.Method, req.URL, time.Now().UTC().Sub(begin))
 		return
 	}
 

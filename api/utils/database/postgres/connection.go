@@ -41,3 +41,8 @@ func Close() {
 	// conexao.Commit()
 	postgres.Close()
 }
+
+// GetPostgres Retornando o postgres
+func GetPostgres() *sql.DB {
+	return postgres
+}
