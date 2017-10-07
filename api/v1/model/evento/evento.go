@@ -2,23 +2,21 @@ package evento
 
 import (
 	"net/http"
-
-	"github.com/JoaoEymard/ingressoscariri/api/utils/database/postgres"
 )
 
 // Insert Retorna os eventos via json
 func Insert() ([]map[string]interface{}, int, error) {
 
-	attributes := "titulo, imagem, cidade, uf, localidade, taxa, mapa, descricao"
+	// attributes := "titulo, imagem, cidade, uf, localidade, taxa, mapa, descricao"
 
-	table := "t_ingressoscariri_evento"
+	// table := "t_ingressoscariri_evento"
 
-	values := []interface{}{"titulo1", "hash(imagem1)", "cidade1", "u1", "localidade1", 19.0, "mapa1", "descricao1"}
+	// values := []interface{}{"titulo1", "hash(imagem1)", "cidade1", "u1", "localidade1", 19.0, "mapa1", "descricao1"}
 
-	_, err := postgres.Insert(attributes, table, values)
-	if err != nil {
-		return nil, http.StatusBadRequest, err
-	}
+	// _, err := postgres.Insert(attributes, table, values)
+	// if err != nil {
+	// 	return nil, http.StatusBadRequest, err
+	// }
 
 	return nil, http.StatusOK, nil
 

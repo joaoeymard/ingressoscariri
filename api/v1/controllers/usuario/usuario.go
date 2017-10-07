@@ -3,18 +3,62 @@ package usuario
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/JoaoEymard/ingressoscariri/api/utils/logger"
 	"github.com/JoaoEymard/ingressoscariri/api/v1/model/usuario"
+	"github.com/JoaoEymard/ingressoscariri/api/v1/utils"
+	"github.com/gorilla/mux"
 )
 
-// Insert Responsavel por Inserir um registro
-func Insert(res http.ResponseWriter, req *http.Request) {
+// Methods Divisão de rotas para gerenciar o controller
+func Methods(res http.ResponseWriter, req *http.Request) {
+
+	var (
+		retornoDados []byte
+		statusCode   int
+		err          error
+	)
 
 	begin := time.Now().UTC()
 
-	jsonEventos, statusCode, err := usuario.Insert(req.Body)
+	switch req.Method {
+
+	case "POST":
+		retornoDados, statusCode, err = usuario.Insert(req.Body)
+
+	case "GET":
+		var urlParams url.Values
+
+		if mux.Vars(req)["id"] == "" {
+			urlParams = req.URL.Query()
+		} else {
+			urlParams = url.Values{
+				"filtro": []string{`{"id":` + mux.Vars(req)["id"] + `}`},
+			}
+		}
+
+		retornoDados, statusCode, err = usuario.Find(urlParams)
+
+	case "PUT":
+		urlParams := url.Values{
+			"id": []string{mux.Vars(req)["id"]},
+		}
+
+		retornoDados, statusCode, err = usuario.Update(req.Body, urlParams)
+
+	case "DELETE":
+		urlParams := url.Values{
+			"id": []string{mux.Vars(req)["id"]},
+		}
+
+		retornoDados, statusCode, err = usuario.Delete(urlParams)
+
+	default:
+		retornoDados, statusCode, err = nil, http.StatusNotFound, utils.Errors["METHOD_DEFAULT"]
+
+	}
 
 	res.WriteHeader(statusCode)
 	if err != nil {
@@ -23,37 +67,8 @@ func Insert(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	res.Write(jsonEventos)
+	res.Write(retornoDados)
 
 	logger.Infoln(logger.Status(fmt.Sprintf("%+v\n", res)), req.RemoteAddr, req.Method, req.URL, time.Now().UTC().Sub(begin))
-
-}
-
-// Find Retorna o(s) registro(s) via json
-func Find(res http.ResponseWriter, req *http.Request) {
-
-	begin := time.Now().UTC()
-
-	jsonEventos, statusCode, err := usuario.Find(req.URL.Query())
-
-	res.WriteHeader(statusCode)
-	if err != nil {
-		res.Write([]byte(err.Error()))
-		logger.Warnln(logger.Status(fmt.Sprintf("%+v\n", res)), req.RemoteAddr, req.Method, req.URL, time.Now().UTC().Sub(begin))
-		return
-	}
-
-	res.Write(jsonEventos)
-
-	logger.Infoln(logger.Status(fmt.Sprintf("%+v\n", res)), req.RemoteAddr, req.Method, req.URL, time.Now().UTC().Sub(begin))
-}
-
-// Update Responsavel por Atualizar um registro
-func Update(res http.ResponseWriter, req *http.Request) {
-
-}
-
-// Delete Responsavel por Deletar um registro
-func Delete(res http.ResponseWriter, req *http.Request) {
 
 }

@@ -1,22 +1,45 @@
 package postgres
 
 import (
+	"errors"
+	"fmt"
+	"strings"
+
 	// _ Importanto apenas o init
 	_ "github.com/lib/pq"
 )
 
-// Insert Insert Universal para o Banco Postgres
-func Insert(query string, params ...interface{}) (map[string]interface{}, error) {
+// InsertOne Insere um registro no Banco Postgres
+func InsertOne(tabela string, params map[string]interface{}) (map[string]interface{}, error) {
 	var (
-		values map[string]interface{}
+		key, queryValue []string
+		value           []interface{}
+		dados           map[string]interface{}
 	)
+
+	count := 0
+
+	for k, v := range params {
+		// Setando as colunas da tabela
+		key = append(key, k)
+		// Setando os valores que serão inseridos
+		value = append(value, v)
+
+		count++
+		queryValue = append(queryValue, fmt.Sprintf("$%d", count))
+	}
+
+	query := fmt.Sprintf(`INSERT INTO %v
+	( %v )
+	VALUES( %v )
+	RETURNING id;`, tabela, strings.Join(key, ", "), strings.Join(queryValue, ", "))
 
 	stmt, err := postgres.Prepare(query)
 	if err != nil {
 		return nil, err
 	}
 
-	rows, err := stmt.Query(params...)
+	rows, err := stmt.Query(value...)
 	if err != nil {
 		return nil, err
 	}
@@ -38,9 +61,13 @@ func Insert(query string, params ...interface{}) (map[string]interface{}, error)
 
 		rows.Scan(refs...)
 
-		values = rowsValues
+		dados = rowsValues
 
 	}
 
-	return values, nil
+	if dados == nil {
+		return nil, errors.New(`{"erro": "Ocorreu um erro ao inserir o registro"}`)
+	}
+
+	return dados, nil
 }

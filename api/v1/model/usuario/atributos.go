@@ -2,12 +2,12 @@ package usuario
 
 var (
 	filtros = map[string]string{
-		"id":   "USR.id = %v",
-		"nome": "USR.nome ILIKE '%%'|| '%v' ||'%%'",
+		"id":   "USUARIO.id = %v",
+		"nome": "USUARIO.nome ILIKE '%%'|| '%v' ||'%%'",
 	}
 )
 
-func validParams(params map[string]interface{}) bool {
+func validValues(params map[string]interface{}) bool {
 
 	if value, valueOf := params["nome"].(string); value == "" && !valueOf {
 		return false

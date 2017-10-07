@@ -15,10 +15,8 @@ func ConfigRoutes(route *mux.Router) {
 	route.HandleFunc("/evento/{link:[a-zA-Z0-9_]+?}", ctrlEvento.FindByID).Methods("GET")
 
 	// Usuarios
-	route.HandleFunc("/usuario", ctrlUser.Insert).Methods("POST")
-	route.HandleFunc("/usuario", ctrlUser.Find).Methods("GET")
-	route.HandleFunc("/usuario/{id:[0-9]}", ctrlUser.Update).Methods("PUT")
-	route.HandleFunc("/usuario/{id:[0-9]}", ctrlUser.Delete).Methods("DELETE")
+	route.HandleFunc("/usuario", ctrlUser.Methods).Methods("POST", "GET")
+	route.HandleFunc("/usuario/{id:[0-9]+}", ctrlUser.Methods).Methods("GET", "PUT", "DELETE")
 
 	// Teste
 	route.HandleFunc("/withAuth", ctrlAuth.Check).Methods("GET")

@@ -68,43 +68,7 @@ func SetParams(params url.Values, filtros map[string]string) (string, string, st
 	return filter, order, limit, offset, nil
 }
 
-// Select Select que retorna um array map com o nome das colunas e os valores recebido do banco
-func Select(query string) ([]map[string]interface{}, error) {
-
-	var (
-		values []map[string]interface{}
-	)
-
-	rows, err := postgres.Query(query)
-	if err != nil {
-		return nil, err
-	}
-
-	columns, _ := rows.Columns()
-
-	for rows.Next() {
-
-		var (
-			rowsValues = make(map[string]interface{}, len(columns))
-			refs       = make([]interface{}, 0, len(columns))
-		)
-
-		for _, column := range columns {
-			var ref interface{}
-			rowsValues[column] = &ref
-			refs = append(refs, &ref)
-		}
-
-		rows.Scan(refs...)
-
-		values = append(values, rowsValues)
-
-	}
-
-	return values, nil
-}
-
-// SelectOne Select que retorna um map com o nome das colunas e o valor recebido do banco
+// SelectOne Coleta e retorna um map com o nome das colunas e o valor recebido do banco
 func SelectOne(query string) (map[string]interface{}, error) {
 
 	var (
@@ -134,6 +98,42 @@ func SelectOne(query string) (map[string]interface{}, error) {
 		rows.Scan(refs...)
 
 		values = rowsValues
+
+	}
+
+	return values, nil
+}
+
+// Select Coleta e retorna um array map com o nome das colunas e os valores recebido do banco
+func Select(query string) ([]map[string]interface{}, error) {
+
+	var (
+		values []map[string]interface{}
+	)
+
+	rows, err := postgres.Query(query)
+	if err != nil {
+		return nil, err
+	}
+
+	columns, _ := rows.Columns()
+
+	for rows.Next() {
+
+		var (
+			rowsValues = make(map[string]interface{}, len(columns))
+			refs       = make([]interface{}, 0, len(columns))
+		)
+
+		for _, column := range columns {
+			var ref interface{}
+			rowsValues[column] = &ref
+			refs = append(refs, &ref)
+		}
+
+		rows.Scan(refs...)
+
+		values = append(values, rowsValues)
 
 	}
 

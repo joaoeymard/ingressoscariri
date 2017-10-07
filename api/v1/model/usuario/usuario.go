@@ -17,56 +17,65 @@ const (
 	// Tabela referente ao usuario
 	tableUsuario = "t_ingressoscariri_usuario"
 	// Tabela referente ao contato
-	tableContato = "t_ingressoscariri_usuario_contato"
-	// Para fazer a consulta do total de registro
-	countTotal = "COUNT(*) AS total"
+	tableUsuarioContato = "t_ingressoscariri_usuario_contato"
 )
 
 // Insert Adiciona um registro
-func Insert(content io.ReadCloser) ([]byte, int, error) {
+func Insert(contentBody io.ReadCloser) ([]byte, int, error) {
 
-	var paramsJSON map[string]interface{}
+	var contentJSON map[string]interface{}
 
-	params, err := ioutil.ReadAll(content)
+	content, err := ioutil.ReadAll(contentBody)
 	if err != nil {
 		return nil, http.StatusBadRequest, err
 	}
 
-	err = json.Unmarshal(params, &paramsJSON)
+	err = json.Unmarshal(content, &contentJSON)
 	if err != nil {
 		return nil, http.StatusBadRequest, err
 	}
 
-	if !validParams(paramsJSON) {
+	if !validValues(contentJSON) {
 		return nil, http.StatusBadRequest, errors.New(`{"erro": "Parametros inválidos"}`)
 	}
 
-	sql := fmt.Sprintf(`INSERT INTO %v( nome, senha, ativo, cpf, data_nascimento, sexo, nivel )
-						VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id;`, tableUsuario)
+	values := map[string]interface{}{
+		"nome":            contentJSON["nome"],
+		"senha":           contentJSON["senha"],
+		"ativo":           contentJSON["ativo"],
+		"cpf":             contentJSON["cpf"],
+		"data_nascimento": contentJSON["data_nascimento"],
+		"sexo":            contentJSON["sexo"],
+		"nivel":           contentJSON["nivel"],
+	}
 
-	rows, err := postgres.Insert(sql, paramsJSON["nome"], paramsJSON["senha"], paramsJSON["ativo"], paramsJSON["cpf"], paramsJSON["data_nascimento"], paramsJSON["sexo"], paramsJSON["nivel"])
+	rows, err := postgres.InsertOne(tableUsuario, values)
 	if err != nil {
 		return nil, http.StatusBadRequest, utils.BancoDados(err)
 	}
 
-	if rows == nil {
-		return nil, http.StatusBadRequest, errors.New(`{"erro": "Não conseguiu cadastrar o usuario"}`)
-	}
+	if validParamsContato(contentJSON) {
 
-	if validParamsContato(paramsJSON) {
+		contato := contentJSON["contato"].(map[string]interface{})
 
-		contato := paramsJSON["contato"].(map[string]interface{})
-
-		sql := fmt.Sprintf(`INSERT INTO %v( id_usuario, endereco, complemento, referencia, bairro, cep, cidade, uf, telefone_principal, telefone_secundario, telefone_terciario, email )
-							VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id;`, tableContato)
-
-		rowsContato, err := postgres.Insert(sql, rows["id"], contato["endereco"], contato["complemento"], contato["referencia"], contato["bairro"], contato["cep"], contato["cidade"], contato["uf"], contato["telefone_principal"], contato["telefone_secundario"], contato["telefone_terciario"], contato["email"])
-		if err != nil {
-			return nil, http.StatusBadRequest, utils.BancoDados(err)
+		values = map[string]interface{}{
+			"id_usuario":          rows["id"],
+			"endereco":            contato["endereco"],
+			"complemento":         contato["complemento"],
+			"referencia":          contato["referencia"],
+			"bairro":              contato["bairro"],
+			"cep":                 contato["cep"],
+			"cidade":              contato["cidade"],
+			"uf":                  contato["uf"],
+			"telefone_principal":  contato["telefone_principal"],
+			"telefone_secundario": contato["telefone_secundario"],
+			"telefone_terciario":  contato["telefone_terciario"],
+			"email":               contato["email"],
 		}
 
-		if rowsContato == nil {
-			return nil, http.StatusBadRequest, errors.New(`{"erro": "Não conseguiu cadastrar o contato"}`)
+		_, err := postgres.InsertOne(tableUsuarioContato, values)
+		if err != nil {
+			return nil, http.StatusBadRequest, utils.BancoDados(err)
 		}
 	}
 
@@ -84,12 +93,20 @@ func Find(params url.Values) ([]byte, int, error) {
 
 	var dadosRows []map[string]interface{}
 
+	// Tratamento dos paramentros e filtro recebidos pela URL
+	filter, order, limit, offset, err := postgres.SetParams(params, filtros)
+	if err != nil {
+		return nil, http.StatusBadRequest, utils.ParamsInvalidos(err)
+	}
+
 	// Consulta para saber o total de registro
-	sqlTotal := fmt.Sprintf(`SELECT %v
-	FROM %v`, countTotal, tableUsuario)
+	sqlTotal := fmt.Sprintf(`SELECT COUNT(USUARIO.id) AS total
+	FROM %v USUARIO
+	LEFT JOIN %v USUARIO_CONTATO ON USUARIO.id = USUARIO_CONTATO.id_usuario
+	%v`, tableUsuario, tableUsuarioContato, filter)
 
 	// Retorna um []map com as colunas e valores vindo do banco de dados
-	rowsTotal, err := postgres.SelectOne(sqlTotal)
+	rowsTotal, err := postgres.Select(sqlTotal)
 	if err != nil {
 		return nil, http.StatusBadRequest, utils.BancoDados(err)
 	}
@@ -99,18 +116,12 @@ func Find(params url.Values) ([]byte, int, error) {
 		return nil, http.StatusNotFound, utils.Errors["NOT_FOUND"]
 	}
 
-	// Tratamento dos paramentros e filtro recebidos pela URL
-	filter, order, limit, offset, err := postgres.SetParams(params, filtros)
-	if err != nil {
-		return nil, http.StatusBadRequest, utils.ParamsInvalidos(err)
-	}
-
 	// Consulta para coletar os registro
-	sql := fmt.Sprintf(`SELECT USR.id AS id, USR.nome, USR.senha, USR.ultimo_acesso, USR.ativo, USR.cpf, USR.data_nascimento, USR.sexo, USR.nivel,
-	CONTATO.id AS contato_id, CONTATO.endereco, CONTATO.complemento, CONTATO.referencia, CONTATO.bairro, CONTATO.cep, CONTATO.cidade, CONTATO.uf, CONTATO.telefone_principal, CONTATO.telefone_secundario, CONTATO.telefone_terciario, CONTATO.email
-	FROM %v USR
-	LEFT JOIN %v CONTATO ON USR.id = CONTATO.id_usuario
-	%v %v %v %v`, tableUsuario, tableContato, filter, order, limit, offset)
+	sql := fmt.Sprintf(`SELECT USUARIO.id AS id, USUARIO.nome, USUARIO.senha, USUARIO.ultimo_acesso, USUARIO.ativo, USUARIO.cpf, USUARIO.data_nascimento, USUARIO.sexo, USUARIO.nivel,
+	USUARIO_CONTATO.id AS contato_id, USUARIO_CONTATO.endereco, USUARIO_CONTATO.complemento, USUARIO_CONTATO.referencia, USUARIO_CONTATO.bairro, USUARIO_CONTATO.cep, USUARIO_CONTATO.cidade, USUARIO_CONTATO.uf, USUARIO_CONTATO.telefone_principal, USUARIO_CONTATO.telefone_secundario, USUARIO_CONTATO.telefone_terciario, USUARIO_CONTATO.email
+	FROM %v USUARIO
+	LEFT JOIN %v USUARIO_CONTATO ON USUARIO.id = USUARIO_CONTATO.id_usuario
+	%v %v %v %v`, tableUsuario, tableUsuarioContato, filter, order, limit, offset)
 
 	// Retorna um []map com as colunas e valores vindo do banco de dados
 	rows, err := postgres.Select(sql)
@@ -154,7 +165,7 @@ func Find(params url.Values) ([]byte, int, error) {
 	// Monta a estrutura de retorno
 	dados := map[string]interface{}{
 		"dados": dadosRows,
-		"total": rowsTotal["total"],
+		"total": rowsTotal[0]["total"],
 	}
 
 	// Converte a estrutura para json
@@ -167,15 +178,69 @@ func Find(params url.Values) ([]byte, int, error) {
 }
 
 // Update Adiciona um registro
-func Update() ([]map[string]interface{}, int, error) {
+func Update(contentBody io.ReadCloser, params url.Values) ([]byte, int, error) {
 
-	return nil, 0, nil
+	var contentJSON map[string]interface{}
+
+	content, err := ioutil.ReadAll(contentBody)
+	if err != nil {
+		return nil, http.StatusBadRequest, err
+	}
+
+	err = json.Unmarshal(content, &contentJSON)
+	if err != nil {
+		return nil, http.StatusBadRequest, err
+	}
+
+	if params.Get("id") == "" {
+		return nil, http.StatusBadRequest, utils.ParamsRequired("id")
+	}
+
+	values := map[string]interface{}{
+		"nome":            contentJSON["nome"],
+		"senha":           contentJSON["senha"],
+		"ativo":           contentJSON["ativo"],
+		"cpf":             contentJSON["cpf"],
+		"data_nascimento": contentJSON["data_nascimento"],
+		"sexo":            contentJSON["sexo"],
+		"nivel":           contentJSON["nivel"],
+	}
+
+	where := fmt.Sprintf("id = %v", params.Get("id"))
+
+	rows, err := postgres.UpdateOne(tableUsuario, values, where)
+	if err != nil {
+		return nil, http.StatusBadRequest, utils.BancoDados(err)
+	}
+
+	retorno, err := json.Marshal(rows)
+	if err != nil {
+		return nil, http.StatusBadRequest, err
+	}
+
+	return retorno, http.StatusNoContent, nil
 
 }
 
 // Delete Adiciona um registro
-func Delete() ([]map[string]interface{}, int, error) {
+func Delete(params url.Values) ([]byte, int, error) {
 
-	return nil, 0, nil
+	if params.Get("id") == "" {
+		return nil, http.StatusBadRequest, utils.ParamsRequired("id")
+	}
+
+	where := fmt.Sprintf("id = %v", params.Get("id"))
+
+	rows, err := postgres.DeleteOne(tableUsuario, where)
+	if err != nil {
+		return nil, http.StatusBadRequest, utils.BancoDados(err)
+	}
+
+	retorno, err := json.Marshal(rows)
+	if err != nil {
+		return nil, http.StatusBadRequest, err
+	}
+
+	return retorno, http.StatusNoContent, nil
 
 }
