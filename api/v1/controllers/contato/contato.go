@@ -1,4 +1,4 @@
-package usuario
+package contato
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/JoaoEymard/ingressoscariri/api/utils/logger"
-	"github.com/JoaoEymard/ingressoscariri/api/v1/model/usuario"
+	"github.com/JoaoEymard/ingressoscariri/api/v1/model/contato"
 	"github.com/JoaoEymard/ingressoscariri/api/v1/utils"
 	"github.com/gorilla/mux"
 )
@@ -23,41 +23,45 @@ func Methods(res http.ResponseWriter, req *http.Request) {
 
 	begin := time.Now().UTC()
 
-	res.Header().Set("Content-Type", "application/json")
-
 	switch req.Method {
 
 	case "POST":
-		retornoDados, statusCode, err = usuario.Insert(req.Body)
-
-	case "GET":
-		var urlParams url.Values
-
-		if mux.Vars(req)["usuarioID"] == "" {
-			urlParams = req.URL.Query()
-		} else {
-			urlParams = url.Values{
-				"filtro": []string{`{
-					"usuarioID":` + mux.Vars(req)["usuarioID"] + `
-					}`},
-			}
+		urlParams := url.Values{
+			"usuarioID": []string{mux.Vars(req)["usuarioID"]},
 		}
+		retornoDados, statusCode, err = contato.Insert(req.Body, urlParams)
 
-		retornoDados, statusCode, err = usuario.Find(urlParams)
+	// case "GET":
+	// 	var urlParams url.Values
+
+	// 	if mux.Vars(req)["usuarioID"] == "" && mux.Vars(req)["contatoID"] == "" {
+	// 		urlParams = req.URL.Query()
+	// 	} else {
+	// 		urlParams = url.Values{
+	// 			"filtro": []string{`{
+	// 				"usuarioID":` + mux.Vars(req)["usuarioID"] + `,
+	// 				"contatoID":` + mux.Vars(req)["usuarioID"] + `
+	// 				}`},
+	// 		}
+	// 	}
+
+	// 	retornoDados, statusCode, err = contato.Find(urlParams)
 
 	case "PUT":
 		urlParams := url.Values{
 			"usuarioID": []string{mux.Vars(req)["usuarioID"]},
+			"contatoID": []string{mux.Vars(req)["contatoID"]},
 		}
 
-		retornoDados, statusCode, err = usuario.Update(req.Body, urlParams)
+		retornoDados, statusCode, err = contato.Update(req.Body, urlParams)
 
 	case "DELETE":
 		urlParams := url.Values{
 			"usuarioID": []string{mux.Vars(req)["usuarioID"]},
+			"contatoID": []string{mux.Vars(req)["contatoID"]},
 		}
 
-		retornoDados, statusCode, err = usuario.Delete(urlParams)
+		retornoDados, statusCode, err = contato.Delete(urlParams)
 
 	default:
 		retornoDados, statusCode, err = nil, http.StatusNotFound, utils.Errors["METHOD_DEFAULT"]

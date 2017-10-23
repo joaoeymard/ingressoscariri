@@ -1,10 +1,10 @@
 package postgres
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
+	"github.com/JoaoEymard/ingressoscariri/api/v1/utils"
 	// _ Importanto apenas o init
 	_ "github.com/lib/pq"
 )
@@ -68,7 +68,7 @@ func UpdateOne(tabela string, params map[string]interface{}, where string) (map[
 	}
 
 	if dados == nil {
-		return nil, errors.New(`{"erro": "Ocorreu um erro ao atualizar o registro"}`)
+		return nil, utils.BancoDadosMethod("atualizar")
 	}
 
 	return dados, nil

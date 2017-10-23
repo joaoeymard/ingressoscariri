@@ -55,7 +55,11 @@ func init() {
 		"OPTIONS",
 	})
 
-	srv.Handler = handlers.CORS(allowedOrigins, allowedMethods)(app)
+	allowedHeaders := handlers.AllowedHeaders([]string{
+		"Content-Type: application/json",
+	})
+
+	srv.Handler = handlers.CORS(allowedOrigins, allowedMethods, allowedHeaders)(app)
 
 }
 

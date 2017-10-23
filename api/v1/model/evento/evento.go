@@ -1,275 +1,247 @@
-package evento
+package usuario
 
 import (
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"io/ioutil"
 	"net/http"
+	"net/url"
+
+	"github.com/JoaoEymard/ingressoscariri/api/utils/database/postgres"
+	"github.com/JoaoEymard/ingressoscariri/api/v1/model/evento/atributo"
+	"github.com/JoaoEymard/ingressoscariri/api/v1/utils"
 )
 
-// Insert Retorna os eventos via json
-func Insert() ([]map[string]interface{}, int, error) {
+const (
+	// Tabela referente ao usuario
+	tableUsuario = "t_ingressoscariri_evento"
+	// Tabela referente ao contato
+	// tableUsuarioContato = "t_ingressoscariri_usuario_contato"
+)
 
-	// attributes := "titulo, imagem, cidade, uf, localidade, taxa, mapa, descricao"
+// Insert Adiciona um registro
+func Insert(contentBody io.ReadCloser) ([]byte, int, error) {
 
-	// table := "t_ingressoscariri_evento"
+	var contentJSON map[string]interface{}
 
-	// values := []interface{}{"titulo1", "hash(imagem1)", "cidade1", "u1", "localidade1", 19.0, "mapa1", "descricao1"}
+	content, err := ioutil.ReadAll(contentBody)
+	if err != nil {
+		return nil, http.StatusBadRequest, err
+	}
 
-	// _, err := postgres.Insert(attributes, table, values)
-	// if err != nil {
-	// 	return nil, http.StatusBadRequest, err
-	// }
+	err = json.Unmarshal(content, &contentJSON)
+	if err != nil {
+		return nil, http.StatusBadRequest, err
+	}
 
-	return nil, http.StatusOK, nil
+	if !validValues(contentJSON) {
+		return nil, http.StatusBadRequest, errors.New(`{"erro": "Parametros inválidos"}`)
+	}
 
-}
+	values := map[string]interface{}{
+		"nome":            contentJSON["nome"],
+		"senha":           contentJSON["senha"],
+		"ativo":           contentJSON["ativo"],
+		"cpf":             contentJSON["cpf"],
+		"data_nascimento": contentJSON["data_nascimento"],
+		"sexo":            contentJSON["sexo"],
+		"nivel":           contentJSON["nivel"],
+	}
 
-// FindAll Retorna os eventos via json
-func FindAll() ([]byte, int, error) {
+	rows, err := postgres.InsertOne(tableUsuario, values)
+	if err != nil {
+		return nil, http.StatusBadRequest, utils.BancoDados(err)
+	}
 
-	// 	var (
-	// 		eventos     []map[string]interface{}
-	// 		periodos    []map[string]interface{}
-	// 		jsonEventos []map[string]interface{}
-	// 	)
+	if validParamsContato(contentJSON) {
 
-	// 	attributes := `DISTINCT ON (evento.id) evento.id AS id_evento, evento.titulo, evento.imagem, evento.cidade, evento.uf, evento.localidade, evento.link,
-	// 				   periodo.id, periodo.data_periodo`
+		contato := contentJSON["contato"].(map[string]interface{})
 
-	// 	table := "t_ingressoscariri_evento AS evento"
+		values = map[string]interface{}{
+			"id_usuario":          rows["id"],
+			"endereco":            contato["endereco"],
+			"complemento":         contato["complemento"],
+			"referencia":          contato["referencia"],
+			"bairro":              contato["bairro"],
+			"cep":                 contato["cep"],
+			"cidade":              contato["cidade"],
+			"uf":                  contato["uf"],
+			"telefone_principal":  contato["telefone_principal"],
+			"telefone_secundario": contato["telefone_secundario"],
+			"telefone_terciario":  contato["telefone_terciario"],
+			"email":               contato["email"],
+		}
 
-	// 	join := "LEFT JOIN t_ingressoscariri_evento_periodo AS periodo ON evento.id = periodo.id_evento"
+		_, err := postgres.InsertOne(tableUsuarioContato, values)
+		if err != nil {
+			return nil, http.StatusBadRequest, utils.BancoDados(err)
+		}
+	}
 
-	// 	where := "periodo.data_periodo >= NOW()"
+	retorno, err := json.Marshal(rows)
+	if err != nil {
+		return nil, http.StatusBadRequest, err
+	}
 
-	// 	order := "evento.id ASC, periodo.data_periodo ASC"
-
-	// 	rows, err := postgres.Select(attributes, table, join, where, order, "")
-	// 	if err != nil {
-	// 		return nil, http.StatusBadRequest, errors.New("Bad Request: " + err.Error())
-	// 	}
-
-	// 	for rows.Next() {
-	// 		var (
-	// 			idEvento                                                                         string
-	// 			eventoTitulo, eventoImagem, eventoCidade, eventoUf, eventoLocalidade, eventoLink interface{}
-	// 			idPeriodo                                                                        string
-	// 			periodoDataPeriodo                                                               interface{}
-	// 		)
-
-	// 		rows.Scan(&idEvento, &eventoTitulo, &eventoImagem, &eventoCidade, &eventoUf, &eventoLocalidade, &eventoLink, &idPeriodo, &periodoDataPeriodo)
-
-	// 		eventos = append(eventos, map[string]interface{}{
-	// 			"id":         idEvento,
-	// 			"titulo":     eventoTitulo,
-	// 			"imagem":     eventoImagem,
-	// 			"cidade":     eventoCidade,
-	// 			"uf":         eventoUf,
-	// 			"localidade": eventoLocalidade,
-	// 			"link":       eventoLink,
-	// 		})
-
-	// 		if idPeriodo != "" {
-	// 			periodos = append(periodos, map[string]interface{}{
-	// 				"idEvento":     idEvento,
-	// 				"id":           idPeriodo,
-	// 				"data_periodo": periodoDataPeriodo,
-	// 			})
-	// 		}
-
-	// 	}
-
-	// 	var (
-	// 		periodoAux interface{}
-	// 	)
-
-	// 	for _, evento := range eventos {
-	// 		periodoAux = nil
-	// 		for _, periodo := range periodos {
-	// 			if periodo["idEvento"] == evento["id"] {
-	// 				periodoAux = periodo["data_periodo"]
-	// 				break
-	// 			}
-	// 		}
-
-	// 		jsonEventos = append(jsonEventos, map[string]interface{}{
-	// 			"titulo": evento["titulo"],
-	// 			"imagem": evento["imagem"],
-	// 			"cidade": evento["cidade"],
-	// 			"uf":     evento["uf"],
-	// 			"local":  evento["localidade"],
-	// 			"link":   evento["link"],
-	// 			"data":   periodoAux,
-	// 		})
-	// 	}
-
-	// 	if jsonEventos == nil {
-	// 		return nil, http.StatusNotFound, errors.New("Not Found: Id não encontrado")
-	// 	}
-
-	// 	byteEvento, err := json.Marshal(jsonEventos)
-	// 	if err != nil {
-	// 		return nil, http.StatusBadRequest, errors.New("Not Found: Id não encontrado")
-	// 	}
-
-	return nil, http.StatusOK, nil
+	return retorno, http.StatusCreated, nil
 
 }
 
-// FindByID Retorna o evento correspondente ao id via json
-func FindByID(link string) ([]byte, int, error) {
+// Find Retorna os eventos via json
+func Find(params url.Values) ([]byte, int, error) {
 
-	// 	var (
-	// 		eventos    = make(map[string]interface{})
-	// 		periodos   = make(map[string]interface{})
-	// 		categorias = make(map[string]interface{})
-	// 		galerias   = make(map[string]interface{})
-	// 		jsonEvento map[string]interface{}
-	// 	)
+	var dadosRows []map[string]interface{}
 
-	// 	attributes := `evento.id AS id_evento, evento.titulo, evento.imagem, evento.cidade, evento.uf, evento.localidade, evento.taxa, evento.mapa, evento.descricao, evento.link,
-	// 				   periodo.id AS id_periodo, periodo.data_periodo, periodo.atracao,
-	// 				   categoria.id, categoria.nome, categoria.valor, categoria.quantidade, categoria.quantidade_vendida, categoria.lote,
-	// 				   galeria.id, galeria.imagem`
+	// Tratamento dos paramentros e filtro recebidos pela URL
+	filter, order, limit, offset, err := postgres.SetParams(params, atributo.Filtros)
+	if err != nil {
+		return nil, http.StatusBadRequest, err
+	}
 
-	// 	table := "t_ingressoscariri_evento AS evento"
+	// Consulta para saber o total de registro
+	sqlTotal := fmt.Sprintf(`SELECT COUNT(USUARIO.id) AS total
+	FROM %v USUARIO
+	LEFT JOIN %v USUARIO_CONTATO ON USUARIO.id = USUARIO_CONTATO.id_usuario
+	%v`, tableUsuario, tableUsuarioContato, filter)
 
-	// 	join := `LEFT JOIN t_ingressoscariri_evento_periodo AS periodo ON evento.id = periodo.id_evento
-	// 		 	 LEFT JOIN t_ingressoscariri_periodo_categoria AS categoria ON periodo.id = categoria.id_periodo
-	// 		 	 LEFT JOIN t_ingressoscariri_evento_galeria AS galeria ON evento.id = galeria.id_evento`
+	// Retorna um []map com as colunas e valores vindo do banco de dados
+	rowsTotal, err := postgres.Select(sqlTotal)
+	if err != nil {
+		return nil, http.StatusBadRequest, utils.BancoDados(err)
+	}
 
-	// 	where := "evento.link LIKE '" + link + "'"
+	// Verifica se o retorno está nulo
+	if rowsTotal == nil {
+		return nil, http.StatusNotFound, utils.Errors["NOT_FOUND"]
+	}
 
-	// 	order := "periodo.data_periodo ASC"
+	// Consulta para coletar os registro
+	sql := fmt.Sprintf(`SELECT USUARIO.id AS id, USUARIO.nome, USUARIO.senha, USUARIO.ultimo_acesso, USUARIO.ativo, USUARIO.cpf, USUARIO.data_nascimento, USUARIO.sexo, USUARIO.nivel,
+	USUARIO_CONTATO.id AS contato_id, USUARIO_CONTATO.endereco, USUARIO_CONTATO.complemento, USUARIO_CONTATO.referencia, USUARIO_CONTATO.bairro, USUARIO_CONTATO.cep, USUARIO_CONTATO.cidade, USUARIO_CONTATO.uf, USUARIO_CONTATO.telefone_principal, USUARIO_CONTATO.telefone_secundario, USUARIO_CONTATO.telefone_terciario, USUARIO_CONTATO.email
+	FROM %v USUARIO
+	LEFT JOIN %v USUARIO_CONTATO ON USUARIO.id = USUARIO_CONTATO.id_usuario
+	%v %v %v %v`, tableUsuario, tableUsuarioContato, filter, order, limit, offset)
 
-	// 	rows, err := postgres.Select(attributes, table, join, where, order, "")
-	// 	if err != nil {
-	// 		return nil, http.StatusBadRequest, errors.New("Bad Request: " + err.Error())
-	// 	}
+	// Retorna um []map com as colunas e valores vindo do banco de dados
+	rows, err := postgres.Select(sql)
+	if err != nil {
+		return nil, http.StatusBadRequest, utils.BancoDados(err)
+	}
 
-	// 	for rows.Next() {
-	// 		var (
-	// 			idEvento                                                                                                                  string
-	// 			eventoTitulo, eventoImagem, eventoCidade, eventoUf, eventoLocalidade, eventoTaxa, eventoMapa, eventoDescricao, eventoLink interface{}
-	// 			idPeriodo                                                                                                                 string
-	// 			periodoDataPeriodo, periodoAtracao                                                                                        interface{}
-	// 			idCategoria                                                                                                               string
-	// 			categoriaNome, categoriaValor, categoriaQuantidade, categoriaQuantidadeVendida, categoriaLote                             interface{}
-	// 			idGaleria                                                                                                                 string
-	// 			galeriaImagem                                                                                                             interface{}
-	// 		)
+	// Verifica se o retorno está nulo
+	if rows == nil {
+		return nil, http.StatusNotFound, utils.Errors["NOT_FOUND"]
+	}
 
-	// 		rows.Scan(&idEvento, &eventoTitulo, &eventoImagem, &eventoCidade, &eventoUf, &eventoLocalidade, &eventoTaxa, &eventoMapa, &eventoDescricao, &eventoLink, &idPeriodo, &periodoDataPeriodo, &periodoAtracao, &idCategoria, &categoriaNome, &categoriaValor, &categoriaQuantidade, &categoriaQuantidadeVendida, &categoriaLote, &idGaleria, &galeriaImagem)
+	for _, row := range rows {
+		dadosRows = append(dadosRows, map[string]interface{}{
+			"id":              row["id"],
+			"nome":            row["nome"],
+			"senha":           row["senha"],
+			"ultimo_acesso":   row["ultimo_acesso"],
+			"ativo":           row["ativo"],
+			"cpf":             row["cpf"],
+			"data_nascimento": row["data_nascimento"],
+			"sexo":            row["sexo"],
+			"nivel":           row["nivel"],
+			"contato": map[string]interface{}{
+				"id":                  row["contato_id"],
+				"endereco":            row["endereco"],
+				"complemento":         row["complemento"],
+				"referencia":          row["referencia"],
+				"bairro":              row["bairro"],
+				"cep":                 row["cep"],
+				"cidade":              row["cidade"],
+				"uf":                  row["uf"],
+				"telefone_principal":  row["telefone_principal"],
+				"telefone_secundario": row["telefone_secundario"],
+				"telefone_terciario":  row["telefone_terciario"],
+				"email":               row["email"],
+			},
+		})
+	}
 
-	// 		eventos[idEvento] = map[string]interface{}{
-	// 			"id":         idEvento,
-	// 			"titulo":     eventoTitulo,
-	// 			"imagem":     eventoImagem,
-	// 			"cidade":     eventoCidade,
-	// 			"uf":         eventoUf,
-	// 			"localidade": eventoLocalidade,
-	// 			"taxa":       eventoTaxa,
-	// 			"mapa":       eventoMapa,
-	// 			"descricao":  eventoDescricao,
-	// 			"link":       eventoLink,
-	// 		}
+	// Monta a estrutura de retorno
+	dados := map[string]interface{}{
+		"dados": dadosRows,
+		"total": rowsTotal[0]["total"],
+	}
 
-	// 		if idPeriodo != "" {
-	// 			periodos[idPeriodo] = map[string]interface{}{
-	// 				"idEvento":     idEvento,
-	// 				"id":           idPeriodo,
-	// 				"data_periodo": periodoDataPeriodo,
-	// 				"atracao":      periodoAtracao,
-	// 			}
-	// 		}
+	// Converte a estrutura para json
+	retorno, err := json.Marshal(dados)
+	if err != nil {
+		return nil, http.StatusBadRequest, err
+	}
 
-	// 		if idCategoria != "" {
-	// 			categorias[idCategoria] = map[string]interface{}{
-	// 				"idPeriodo":          idPeriodo,
-	// 				"id":                 idCategoria,
-	// 				"nome":               categoriaNome,
-	// 				"valor":              categoriaValor,
-	// 				"quantidade":         categoriaQuantidade,
-	// 				"quantidade_vendida": categoriaQuantidadeVendida,
-	// 				"lote":               categoriaLote,
-	// 			}
-	// 		}
+	return retorno, http.StatusOK, nil
+}
 
-	// 		if idGaleria != "" {
-	// 			galerias[idGaleria] = map[string]interface{}{
-	// 				"idEvento": idEvento,
-	// 				"id":       idGaleria,
-	// 				"imagem":   galeriaImagem,
-	// 			}
-	// 		}
+// Update Adiciona um registro
+func Update(contentBody io.ReadCloser, params url.Values) ([]byte, int, error) {
 
-	// 	}
+	var contentJSON map[string]interface{}
 
-	// 	var (
-	// 		eventoAux    map[string]interface{}
-	// 		periodoAux   []map[string]interface{}
-	// 		categoriaAux []map[string]interface{}
-	// 		galeriaAux   []map[string]interface{}
-	// 	)
+	content, err := ioutil.ReadAll(contentBody)
+	if err != nil {
+		return nil, http.StatusBadRequest, err
+	}
 
-	// 	for idEvento, evento := range eventos {
-	// 		periodoAux = nil
-	// 		for idPeriodo, periodo := range periodos {
-	// 			categoriaAux = nil
-	// 			if periodo.(map[string]interface{})["idEvento"] == idEvento {
-	// 				for _, categoria := range categorias {
-	// 					if categoria.(map[string]interface{})["idPeriodo"] == idPeriodo {
-	// 						categoriaAux = append(categoriaAux, map[string]interface{}{
-	// 							"nome":               categoria.(map[string]interface{})["nome"],
-	// 							"valor":              categoria.(map[string]interface{})["valor"],
-	// 							"quantidade":         categoria.(map[string]interface{})["quantidade"],
-	// 							"quantidade_vendida": categoria.(map[string]interface{})["quantidade_vendida"],
-	// 							"lote":               categoria.(map[string]interface{})["lote"],
-	// 						})
-	// 					}
-	// 				}
-	// 				periodoAux = append(periodoAux, map[string]interface{}{
-	// 					"atracao":   periodo.(map[string]interface{})["atracao"],
-	// 					"data":      periodo.(map[string]interface{})["data_periodo"],
-	// 					"categoria": categoriaAux,
-	// 				})
-	// 			}
-	// 		}
+	err = json.Unmarshal(content, &contentJSON)
+	if err != nil {
+		return nil, http.StatusBadRequest, err
+	}
 
-	// 		galeriaAux = nil
-	// 		for _, galeria := range galerias {
-	// 			if galeria.(map[string]interface{})["idEvento"] == idEvento {
-	// 				// fmt.Println("Galeria", galeria)
-	// 				galeriaAux = append(galeriaAux, map[string]interface{}{
-	// 					"imagem": galeria.(map[string]interface{})["imagem"],
-	// 				})
-	// 			}
-	// 		}
+	if params.Get("id") == "" {
+		return nil, http.StatusBadRequest, utils.ParamsRequired("id")
+	}
 
-	// 		eventoAux = map[string]interface{}{
-	// 			"titulo":    evento.(map[string]interface{})["titulo"],
-	// 			"imagem":    evento.(map[string]interface{})["imagem"],
-	// 			"cidade":    evento.(map[string]interface{})["cidade"],
-	// 			"estado":    evento.(map[string]interface{})["uf"],
-	// 			"local":     evento.(map[string]interface{})["localidade"],
-	// 			"taxa":      evento.(map[string]interface{})["taxa"],
-	// 			"mapa":      evento.(map[string]interface{})["mapa"],
-	// 			"descricao": evento.(map[string]interface{})["descricao"],
-	// 			"link":      evento.(map[string]interface{})["link"],
-	// 			"periodo":   periodoAux,
-	// 			"galeria":   galeriaAux,
-	// 		}
-	// 	}
+	values := map[string]interface{}{
+		"nome":            contentJSON["nome"],
+		"senha":           contentJSON["senha"],
+		"ativo":           contentJSON["ativo"],
+		"cpf":             contentJSON["cpf"],
+		"data_nascimento": contentJSON["data_nascimento"],
+		"sexo":            contentJSON["sexo"],
+		"nivel":           contentJSON["nivel"],
+	}
 
-	// 	jsonEvento = eventoAux
+	where := fmt.Sprintf("id = %v", params.Get("id"))
 
-	// 	if jsonEvento == nil {
-	// 		return nil, http.StatusNotFound, errors.New("Not Found: Id não encontrado")
-	// 	}
+	rows, err := postgres.UpdateOne(tableUsuario, values, where)
+	if err != nil {
+		return nil, http.StatusBadRequest, utils.BancoDados(err)
+	}
 
-	// 	byteEvento, err := json.Marshal(jsonEvento)
-	// 	if err != nil {
-	// 		return nil, http.StatusBadRequest, errors.New("Not Found: Id não encontrado")
-	// 	}
+	retorno, err := json.Marshal(rows)
+	if err != nil {
+		return nil, http.StatusBadRequest, err
+	}
 
-	return nil, http.StatusOK, nil
+	return retorno, http.StatusNoContent, nil
+
+}
+
+// Delete Adiciona um registro
+func Delete(params url.Values) ([]byte, int, error) {
+
+	if params.Get("id") == "" {
+		return nil, http.StatusBadRequest, utils.ParamsRequired("id")
+	}
+
+	where := fmt.Sprintf("id = %v", params.Get("id"))
+
+	rows, err := postgres.DeleteOne(tableUsuario, where)
+	if err != nil {
+		return nil, http.StatusBadRequest, utils.BancoDados(err)
+	}
+
+	retorno, err := json.Marshal(rows)
+	if err != nil {
+		return nil, http.StatusBadRequest, err
+	}
+
+	return retorno, http.StatusNoContent, nil
 
 }

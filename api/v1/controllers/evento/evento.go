@@ -5,73 +5,66 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gorilla/mux"
-
 	"github.com/JoaoEymard/ingressoscariri/api/utils/logger"
-	"github.com/JoaoEymard/ingressoscariri/api/v1/model/evento"
+	"github.com/JoaoEymard/ingressoscariri/api/v1/utils"
 )
 
-// Insert Responsavel por Inserir o registro
-func Insert(res http.ResponseWriter, req *http.Request) {
+// Methods Divisão de rotas para gerenciar o controller
+func Methods(res http.ResponseWriter, req *http.Request) {
 
-	var c struct {
-		Evento string
-	}
-
-	// if err := ctx.ReadJSON(&c); err != nil {
-	// ctx.StatusCode(iris.StatusBadRequest)
-	// ctx.WriteString(err.Error())
-	// 	return
-	// }
-
-	fmt.Printf("Received: %#v\n", c)
-
-	// ctx.Writef("Received: %#v\n", c)
-
-	// jsonEventos, statusCode, err := eventos.Insert()
-	// ctx.StatusCode(statusCode)
-
-	// if err != nil {
-	// 	ctx.JSON(err.Error())
-	// 	return
-	// }
-
-	// ctx.JSON(jsonEventos)
-	// ctx.JSON("1")
-}
-
-// FindAll Retorna os eventos via json
-func FindAll(res http.ResponseWriter, req *http.Request) {
+	var (
+		retornoDados []byte
+		statusCode   int
+		err          error
+	)
 
 	begin := time.Now().UTC()
 
-	jsonEventos, statusCode, err := evento.FindAll()
+	switch req.Method {
+
+	case "POST":
+		// retornoDados, statusCode, err = evento.Insert(req.Body)
+
+	case "GET":
+		// var urlParams url.Values
+
+		// if mux.Vars(req)["id"] == "" {
+		// 	urlParams = req.URL.Query()
+		// } else {
+		// 	urlParams = url.Values{
+		// 		"filtro": []string{`{"id":` + mux.Vars(req)["id"] + `}`},
+		// 	}
+		// }
+
+		// retornoDados, statusCode, err = evento.Find(urlParams)
+
+	case "PUT":
+		// urlParams := url.Values{
+		// 	"id": []string{mux.Vars(req)["id"]},
+		// }
+
+		// retornoDados, statusCode, err = evento.Update(req.Body, urlParams)
+
+	case "DELETE":
+		// urlParams := url.Values{
+		// 	"id": []string{mux.Vars(req)["id"]},
+		// }
+
+		// retornoDados, statusCode, err = evento.Delete(urlParams)
+
+	default:
+		retornoDados, statusCode, err = nil, http.StatusNotFound, utils.Errors["METHOD_DEFAULT"]
+
+	}
 
 	res.WriteHeader(statusCode)
 	if err != nil {
 		res.Write([]byte(err.Error()))
+		logger.Warnln(logger.Status(fmt.Sprintf("%+v\n", res)), req.RemoteAddr, req.Method, req.URL, time.Now().UTC().Sub(begin))
 		return
 	}
 
-	res.Write(jsonEventos)
-
-	logger.Infoln(logger.Status(fmt.Sprintf("%+v\n", res)), req.RemoteAddr, req.Method, req.URL, time.Now().UTC().Sub(begin))
-}
-
-// FindByID Retorna o evento correspondente ao id via json
-func FindByID(res http.ResponseWriter, req *http.Request) {
-
-	begin := time.Now().UTC()
-
-	jsonEvento, statusCode, err := evento.FindByID(mux.Vars(req)["link"])
-
-	res.WriteHeader(statusCode)
-	if err != nil {
-		res.Write([]byte(err.Error()))
-		return
-	}
-
-	res.Write(jsonEvento)
+	res.Write(retornoDados)
 
 	logger.Infoln(logger.Status(fmt.Sprintf("%+v\n", res)), req.RemoteAddr, req.Method, req.URL, time.Now().UTC().Sub(begin))
 

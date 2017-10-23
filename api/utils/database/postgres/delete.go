@@ -1,10 +1,10 @@
 package postgres
 
 import (
-	// _ Importanto apenas o init
-	"errors"
 	"fmt"
 
+	"github.com/JoaoEymard/ingressoscariri/api/v1/utils"
+	// _ Importanto apenas o init
 	_ "github.com/lib/pq"
 )
 
@@ -46,7 +46,7 @@ func DeleteOne(tabela string, where string) (map[string]interface{}, error) {
 	}
 
 	if dados == nil {
-		return nil, errors.New(`{"erro": "Ocorreu um erro ao deletar o registro"}`)
+		return nil, utils.BancoDadosMethod("deletar")
 	}
 
 	return dados, nil

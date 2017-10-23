@@ -2,8 +2,9 @@ package v1
 
 import (
 	ctrlAuth "github.com/JoaoEymard/ingressoscariri/api/v1/controllers/auth"
-	ctrlEvento "github.com/JoaoEymard/ingressoscariri/api/v1/controllers/evento"
-	ctrlUser "github.com/JoaoEymard/ingressoscariri/api/v1/controllers/usuario"
+	"github.com/JoaoEymard/ingressoscariri/api/v1/controllers/contato"
+	"github.com/JoaoEymard/ingressoscariri/api/v1/controllers/evento"
+	"github.com/JoaoEymard/ingressoscariri/api/v1/controllers/usuario"
 	"github.com/gorilla/mux"
 )
 
@@ -11,12 +12,17 @@ import (
 func ConfigRoutes(route *mux.Router) {
 
 	// Eventos
-	route.HandleFunc("/evento", ctrlEvento.FindAll).Methods("GET")
-	route.HandleFunc("/evento/{link:[a-zA-Z0-9_]+?}", ctrlEvento.FindByID).Methods("GET")
+	route.HandleFunc("/evento", evento.Methods).Methods("POST", "GET")
+	route.HandleFunc("/evento/{link:[a-zA-Z0-9_]+?}", evento.Methods).Methods("GET", "PUT", "DELETE")
 
 	// Usuarios
-	route.HandleFunc("/usuario", ctrlUser.Methods).Methods("POST", "GET")
-	route.HandleFunc("/usuario/{id:[0-9]+}", ctrlUser.Methods).Methods("GET", "PUT", "DELETE")
+	route.HandleFunc("/usuario/{usuarioID:[0-9]+}", usuario.Methods).Methods("GET", "PUT", "DELETE")
+	route.HandleFunc("/usuario/", usuario.Methods).Methods("POST", "GET")
+	route.HandleFunc("/usuario", usuario.Methods).Methods("POST", "GET")
+
+	// Contatos
+	route.HandleFunc("/usuario/{usuarioID:[0-9]+}/contato", contato.Methods).Methods("POST")
+	route.HandleFunc("/usuario/{usuarioID:[0-9]+}/contato/{contatoID:[0-9]+}", contato.Methods).Methods("PUT", "DELETE")
 
 	// Teste
 	route.HandleFunc("/withAuth", ctrlAuth.Check).Methods("GET")

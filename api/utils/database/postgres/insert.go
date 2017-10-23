@@ -1,10 +1,10 @@
 package postgres
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
+	"github.com/JoaoEymard/ingressoscariri/api/v1/utils"
 	// _ Importanto apenas o init
 	_ "github.com/lib/pq"
 )
@@ -66,7 +66,7 @@ func InsertOne(tabela string, params map[string]interface{}) (map[string]interfa
 	}
 
 	if dados == nil {
-		return nil, errors.New(`{"erro": "Ocorreu um erro ao inserir o registro"}`)
+		return nil, utils.BancoDadosMethod("inserir")
 	}
 
 	return dados, nil
