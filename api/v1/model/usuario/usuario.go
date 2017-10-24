@@ -2,7 +2,6 @@ package usuario
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -36,8 +35,8 @@ func Insert(contentBody io.ReadCloser) ([]byte, int, error) {
 		return nil, http.StatusBadRequest, err
 	}
 
-	if atr := atributo.ValidValues(contentJSON); atr != nil {
-		return nil, http.StatusBadRequest, errors.New(`{"erro": "Parametros inválidos"}`)
+	if err = atributo.ValidValues(contentJSON); err != nil {
+		return nil, http.StatusBadRequest, err
 	}
 
 	values := map[string]interface{}{
@@ -76,28 +75,33 @@ func Find(params url.Values) ([]byte, int, error) {
 	}
 
 	// Consulta para saber o total de registro
-	sqlTotal := fmt.Sprintf(`SELECT COUNT(USUARIO.id) AS total
-	FROM %v USUARIO
-	LEFT JOIN %v USUARIO_CONTATO ON USUARIO.id = USUARIO_CONTATO.id_usuario
-	%v`, tUsuario, tUsuarioContato, filter)
+	// sqlTotal := fmt.Sprintf(`SELECT COUNT(USUARIO.id) AS total
+	// FROM %v USUARIO
+	// %v`, tUsuario, filter)
 
 	// Retorna um []map com as colunas e valores vindo do banco de dados
-	rowsTotal, err := postgres.Select(sqlTotal)
-	if err != nil {
-		return nil, http.StatusBadRequest, utils.BancoDados(err)
-	}
+	// rowsTotal, err := postgres.Select(sqlTotal)
+	// if err != nil {
+	// 	return nil, http.StatusBadRequest, utils.BancoDados(err)
+	// }
 
 	// Verifica se o retorno está nulo
-	if rowsTotal == nil {
-		return nil, http.StatusNotFound, utils.Errors["NOT_FOUND"]
-	}
+	// if rowsTotal == nil {
+	// 	return nil, http.StatusNotFound, utils.Errors["NOT_FOUND"]
+	// }
 
 	// Consulta para coletar os registro
 	sql := fmt.Sprintf(`SELECT USUARIO.id AS id, USUARIO.nome, USUARIO.ultimo_acesso, USUARIO.ativo, USUARIO.cpf, USUARIO.data_nascimento, USUARIO.sexo, USUARIO.nivel,
-	USUARIO_CONTATO.id AS contato_id, USUARIO_CONTATO.endereco, USUARIO_CONTATO.complemento, USUARIO_CONTATO.referencia, USUARIO_CONTATO.bairro, USUARIO_CONTATO.cep, USUARIO_CONTATO.cidade, USUARIO_CONTATO.uf, USUARIO_CONTATO.telefone_principal, USUARIO_CONTATO.telefone_secundario, USUARIO_CONTATO.telefone_terciario, USUARIO_CONTATO.email
+	(
+		SELECT array_to_json (array_agg (row_to_json(dados_contatos.*) ) ) 
+		FROM (
+			SELECT USUARIO_CONTATO.id AS contato_id, USUARIO_CONTATO.endereco, USUARIO_CONTATO.complemento, USUARIO_CONTATO.referencia, USUARIO_CONTATO.bairro, USUARIO_CONTATO.cep, USUARIO_CONTATO.cidade, USUARIO_CONTATO.uf, USUARIO_CONTATO.telefone_principal, USUARIO_CONTATO.telefone_secundario, USUARIO_CONTATO.telefone_terciario, USUARIO_CONTATO.email
+			FROM %v USUARIO_CONTATO
+			WHERE USUARIO_CONTATO.id_usuario = USUARIO.id
+		) AS dados_contatos
+	) AS contatos
 	FROM %v USUARIO
-	LEFT JOIN %v USUARIO_CONTATO ON USUARIO.id = USUARIO_CONTATO.id_usuario
-	%v %v %v %v`, tUsuario, tUsuarioContato, filter, order, limit, offset)
+	%v %v %v %v`, tUsuarioContato, tUsuario, filter, order, limit, offset)
 
 	// Retorna um []map com as colunas e valores vindo do banco de dados
 	rows, err := postgres.Select(sql)
@@ -112,37 +116,20 @@ func Find(params url.Values) ([]byte, int, error) {
 
 	// Montar o json de retorno
 	for _, row := range rows {
-		dadosRows = append(dadosRows, map[string]interface{}{
-			"id":              row["id"],
-			"nome":            row["nome"],
-			"senha":           row["senha"],
-			"ultimo_acesso":   row["ultimo_acesso"],
-			"ativo":           row["ativo"],
-			"cpf":             row["cpf"],
-			"data_nascimento": row["data_nascimento"],
-			"sexo":            row["sexo"],
-			"nivel":           row["nivel"],
-			"contato": map[string]interface{}{
-				"id":                  row["contato_id"],
-				"endereco":            row["endereco"],
-				"complemento":         row["complemento"],
-				"referencia":          row["referencia"],
-				"bairro":              row["bairro"],
-				"cep":                 row["cep"],
-				"cidade":              row["cidade"],
-				"uf":                  row["uf"],
-				"telefone_principal":  row["telefone_principal"],
-				"telefone_secundario": row["telefone_secundario"],
-				"telefone_terciario":  row["telefone_terciario"],
-				"email":               row["email"],
-			},
-		})
+		// Converte a estrutura para json
+		// jsonContato, err := json.Marshal(row["contatos"])
+		// if err != nil {
+		// 	return nil, http.StatusBadRequest, err
+		// }
+		row["contatos"] = nil
+		// fmt.Printf("%v\n", row["contatos"])
+		dadosRows = append(dadosRows, row)
 	}
 
 	// Monta a estrutura de retorno
 	dados := map[string]interface{}{
 		"dados": dadosRows,
-		"total": rowsTotal[0]["total"],
+		// "total": rowsTotal[0]["total"],
 	}
 
 	// Converte a estrutura para json
@@ -184,8 +171,8 @@ func Update(contentBody io.ReadCloser, params url.Values) ([]byte, int, error) {
 		return nil, http.StatusBadRequest, err
 	}
 
-	if atr := atributo.ValidValues(contentJSON); atr != nil {
-		return nil, http.StatusBadRequest, atr
+	if err = atributo.ValidValues(contentJSON); err != nil {
+		return nil, http.StatusBadRequest, err
 	}
 
 	values := map[string]interface{}{

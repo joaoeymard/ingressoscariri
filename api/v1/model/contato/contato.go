@@ -2,7 +2,6 @@ package contato
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -38,12 +37,12 @@ func Insert(contentBody io.ReadCloser, params url.Values) ([]byte, int, error) {
 		return nil, http.StatusBadRequest, err
 	}
 
-	if !atributo.ValidValues(contentJSON) {
-		return nil, http.StatusBadRequest, errors.New(`{"erro": "Parametros inválidos"}`)
+	if err = atributo.ValidValues(contentJSON); err != nil {
+		return nil, http.StatusBadRequest, err
 	}
 
 	values := map[string]interface{}{
-		"id_usuario":          params.Get("id"),
+		"id_usuario":          params.Get("usuarioID"),
 		"endereco":            contentJSON["endereco"],
 		"complemento":         contentJSON["complemento"],
 		"referencia":          contentJSON["referencia"],

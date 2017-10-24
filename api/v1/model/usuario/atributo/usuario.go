@@ -53,7 +53,7 @@ func nome(value interface{}) error {
 	}
 
 	if len(data) > 50 {
-		return utils.ValueMinino("nome", 50)
+		return utils.ValueMaximo("nome", 50)
 	}
 
 	return nil
@@ -70,6 +70,14 @@ func senha(value interface{}) error {
 		return utils.ValueRequired("senha")
 	}
 
+	if len(data) < 6 {
+		return utils.ValueMinino("senha", 6)
+	}
+
+	if len(data) > 128 {
+		return utils.ValueMaximo("senha", 128)
+	}
+
 	return nil
 }
 
@@ -77,7 +85,7 @@ func ativo(value interface{}) error {
 
 	_, valueType := value.(bool)
 	if !valueType {
-		return utils.ValueInvalidos("ativo", "string")
+		return utils.ValueInvalidos("ativo", "booleano")
 	}
 
 	return nil
@@ -92,6 +100,14 @@ func cpf(value interface{}) error {
 
 	if data == "" {
 		return utils.ValueRequired("cpf")
+	}
+
+	if len(data) < 11 {
+		return utils.ValueMinino("cpf", 11)
+	}
+
+	if len(data) > 15 {
+		return utils.ValueMaximo("cpf", 15)
 	}
 
 	return nil
@@ -122,14 +138,26 @@ func sexo(value interface{}) error {
 		return utils.ValueRequired("sexo")
 	}
 
+	if len(data) < 3 {
+		return utils.ValueMinino("sexo", 3)
+	}
+
+	if len(data) > 15 {
+		return utils.ValueMaximo("sexo", 15)
+	}
+
 	return nil
 }
 
 func nivel(value interface{}) error {
 
-	_, valueType := value.(float64)
+	data, valueType := value.(float64)
 	if !valueType {
-		return utils.ValueInvalidos("nome", "string")
+		return utils.ValueInvalidos("nivel", "float64")
+	}
+
+	if data < 1 {
+		return utils.ValueMinino("nivel", 1)
 	}
 
 	return nil

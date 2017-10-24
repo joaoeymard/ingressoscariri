@@ -23,29 +23,16 @@ func Methods(res http.ResponseWriter, req *http.Request) {
 
 	begin := time.Now().UTC()
 
+	res.Header().Set("Content-Type", "application/json")
+
 	switch req.Method {
 
 	case "POST":
 		urlParams := url.Values{
 			"usuarioID": []string{mux.Vars(req)["usuarioID"]},
 		}
+
 		retornoDados, statusCode, err = contato.Insert(req.Body, urlParams)
-
-	// case "GET":
-	// 	var urlParams url.Values
-
-	// 	if mux.Vars(req)["usuarioID"] == "" && mux.Vars(req)["contatoID"] == "" {
-	// 		urlParams = req.URL.Query()
-	// 	} else {
-	// 		urlParams = url.Values{
-	// 			"filtro": []string{`{
-	// 				"usuarioID":` + mux.Vars(req)["usuarioID"] + `,
-	// 				"contatoID":` + mux.Vars(req)["usuarioID"] + `
-	// 				}`},
-	// 		}
-	// 	}
-
-	// 	retornoDados, statusCode, err = contato.Find(urlParams)
 
 	case "PUT":
 		urlParams := url.Values{

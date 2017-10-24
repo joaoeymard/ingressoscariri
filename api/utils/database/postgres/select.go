@@ -124,14 +124,18 @@ func Select(query string) ([]map[string]interface{}, error) {
 			rowsValues = make(map[string]interface{}, len(columns))
 			refs       = make([]interface{}, 0, len(columns))
 		)
+		// var id, nome, ultimoAcesso, ativo, cpf, dataNascimento, sexo, nivel, contatos interface{}
 
 		for _, column := range columns {
 			var ref interface{}
-			rowsValues[column] = &ref
 			refs = append(refs, &ref)
+			rowsValues[column] = &ref
 		}
 
 		rows.Scan(refs...)
+		// rows.Scan(&id, &nome, &ultimoAcesso, &ativo, &cpf, &dataNascimento, &sexo, &nivel, &contatos)
+
+		fmt.Printf("%T\n", refs[8])
 
 		values = append(values, rowsValues)
 
